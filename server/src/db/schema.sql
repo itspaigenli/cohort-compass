@@ -1,0 +1,61 @@
+CREATE TABLE important_links (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  url TEXT NOT NULL,
+  category VARCHAR(100) NOT NULL,
+  description TEXT,
+  is_featured BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE faq_entries (
+  id SERIAL PRIMARY KEY,
+  question TEXT NOT NULL,
+  answer TEXT NOT NULL,
+  error_topic VARCHAR(100),
+  category VARCHAR(100),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE schedule_items (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  start_time TIMESTAMP NOT NULL,
+  end_time TIMESTAMP,
+  location VARCHAR(255),
+  meeting_url TEXT,
+  recording_url TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE reminders (
+  id SERIAL PRIMARY KEY,
+  text TEXT NOT NULL,
+  done BOOLEAN DEFAULT FALSE,
+  due_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE tags (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE important_link_tags (
+  id SERIAL PRIMARY KEY,
+  link_id INT NOT NULL REFERENCES important_links(id) ON DELETE CASCADE,
+  tag_id INT NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+  UNIQUE (link_id, tag_id)
+);
+
+CREATE TABLE faq_tags (
+  id SERIAL PRIMARY KEY,
+  faq_entry_id INT NOT NULL REFERENCES faq_entries(id) ON DELETE CASCADE,
+  tag_id INT NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+  UNIQUE (faq_entry_id, tag_id)
+);
