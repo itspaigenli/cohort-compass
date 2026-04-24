@@ -1,6 +1,6 @@
 import { query } from "../config/db.js";
 
-export async function getScheduleItems() {
+export async function listScheduleItems() {
   const result = await query(
     `SELECT
       id,
