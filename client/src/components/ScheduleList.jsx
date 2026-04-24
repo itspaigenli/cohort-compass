@@ -31,22 +31,20 @@ export default function ScheduleList() {
   }
 
   return (
-    <section>
-      <h2>Upcoming Schedule</h2>
-
-      <ul>
-        {scheduleItems.map((item) => (
-          <li key={item.id}>
-            <h3>{item.title}</h3>
-            <p>{item.description}</p>
-            <p>
-              {new Date(item.start_time).toLocaleString()} -{" "}
-              {new Date(item.end_time).toLocaleString()}
-            </p>
-            <p>{item.location}</p>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <ul>
+      {scheduleItems.map((item) => (
+        <li key={item.id}>
+          <h3>{item.title}</h3>
+          <p>{item.description}</p>
+          <p>
+            {new Date(item.start_time).toLocaleString()} -{" "}
+            {item.end_time
+              ? new Date(item.end_time).toLocaleString()
+              : "End time TBD"}
+          </p>
+          <p>{item.location}</p>
+        </li>
+      ))}
+    </ul>
   );
 }
