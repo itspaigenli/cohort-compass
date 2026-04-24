@@ -30,6 +30,10 @@ export default function SchedulePreview() {
     return <p>{errorMessage}</p>;
   }
 
+  if (!scheduleItems.length) {
+    return <p>No upcoming schedule items yet.</p>;
+  }
+
   return (
     <ul>
       {scheduleItems.map((item) => (
