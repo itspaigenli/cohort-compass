@@ -1,4 +1,4 @@
-import ScheduleList from "./components/ScheduleList.jsx";
+import SchedulePreview from "./components/SchedulePreview.jsx";
 
 function App() {
   return (
@@ -29,7 +29,7 @@ function App() {
         aria-labelledby="schedule-heading"
       >
         <h2 id="schedule-heading">Upcoming Schedule</h2>
-        <ScheduleList />
+        <SchedulePreview />
       </section>
     </main>
   );

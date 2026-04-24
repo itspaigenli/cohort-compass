@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchScheduleItems } from "../api/scheduleApi.js";
 
-export default function ScheduleList() {
+export default function SchedulePreview() {
   const [scheduleItems, setScheduleItems] = useState([]);
   const [status, setStatus] = useState("loading");
   const [errorMessage, setErrorMessage] = useState("");
