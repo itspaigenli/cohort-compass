@@ -12,17 +12,6 @@ function App() {
         </p>
       </header>
 
-      <section className="quick-links" aria-labelledby="quick-links-heading">
-        <h2 id="quick-links-heading">Quick Access</h2>
-
-        <div className="quick-link-grid">
-          <a href="#schedule">Schedule</a>
-          <a href="#links">Important Links</a>
-          <a href="#reminders">Reminders</a>
-          <a href="#resources">Resources</a>
-        </div>
-      </section>
-
       <section
         id="schedule"
         className="schedule-section"
