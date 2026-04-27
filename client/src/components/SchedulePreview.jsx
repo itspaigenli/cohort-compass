@@ -40,12 +40,7 @@ export default function SchedulePreview() {
         <li key={item.id}>
           <h3>{item.title}</h3>
           <p>{item.description}</p>
-          <p>
-            {new Date(item.start_time).toLocaleString()} -{" "}
-            {item.end_time
-              ? new Date(item.end_time).toLocaleString()
-              : "End time TBD"}
-          </p>
+          <p>{item.date_and_duration_string}</p>
           <p>{item.location}</p>
         </li>
       ))}
