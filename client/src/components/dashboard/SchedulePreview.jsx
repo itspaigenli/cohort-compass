@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchScheduleItems } from "../../api/scheduleApi.js";
+import { fetchScheduleItems } from "../../services/scheduleApi.js";
 
 export default function SchedulePreview() {
   const [scheduleItems, setScheduleItems] = useState([]);

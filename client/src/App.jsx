@@ -1,4 +1,4 @@
-import SchedulePreview from "./components/SchedulePreview.jsx";
+import SchedulePreview from "./components/dashboard/SchedulePreview.jsx";
 
 function App() {
   return (
