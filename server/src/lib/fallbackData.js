@@ -30,3 +30,26 @@ export const fallbackLinks = [
     tags: ["react", "official", "documentation"],
   },
 ];
+
+export const fallbackScheduleItems = [
+  {
+    id: 1,
+    title: "Weekly Check-In",
+    description: "Cohort check-in for updates, blockers, and announcements.",
+    start_time: "2026-05-05T17:00:00.000Z",
+    end_time: "2026-05-05T18:00:00.000Z",
+    location: "Zoom",
+    meeting_url: "https://example.com/check-in",
+    recording_url: null,
+  },
+  {
+    id: 2,
+    title: "Office Hours",
+    description: "Support session for debugging, assignments, and project questions.",
+    start_time: "2026-05-07T18:00:00.000Z",
+    end_time: "2026-05-07T20:00:00.000Z",
+    location: "Zoom",
+    meeting_url: "https://example.com/office-hours",
+    recording_url: null,
+  },
+];
