@@ -1,3 +1,4 @@
+import { fallbackScheduleItems } from "../lib/fallbackData.js";
 import { listScheduleItems } from "../models/scheduleModel.js";
 
 export async function listSchedule(req, res) {
@@ -10,8 +11,9 @@ export async function listSchedule(req, res) {
   } catch (error) {
     console.error("Error fetching schedule items:", error);
 
-    res.status(500).json({
-      error: "Unable to fetch schedule items.",
+    res.json({
+      scheduleItems: fallbackScheduleItems,
+      source: "fallback",
     });
   }
 }
