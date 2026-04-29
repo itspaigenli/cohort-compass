@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { fetchScheduleItems } from "../api/scheduleApi.js";
+import { fetchScheduleItems } from "../../services/scheduleApi.js";
 
-export default function ScheduleList() {
+export default function SchedulePreview() {
   const [scheduleItems, setScheduleItems] = useState([]);
   const [status, setStatus] = useState("loading");
   const [errorMessage, setErrorMessage] = useState("");
@@ -30,23 +30,20 @@ export default function ScheduleList() {
     return <p>{errorMessage}</p>;
   }
 
-  return (
-    <section>
-      <h2>Upcoming Schedule</h2>
+  if (!scheduleItems.length) {
+    return <p>No upcoming schedule items yet.</p>;
+  }
 
-      <ul>
-        {scheduleItems.map((item) => (
-          <li key={item.id}>
-            <h3>{item.title}</h3>
-            <p>{item.description}</p>
-            <p>
-              {new Date(item.start_time).toLocaleString()} -{" "}
-              {new Date(item.end_time).toLocaleString()}
-            </p>
-            <p>{item.location}</p>
-          </li>
-        ))}
-      </ul>
-    </section>
+  return (
+    <ul>
+      {scheduleItems.map((item) => (
+        <li key={item.id}>
+          <h3>{item.title}</h3>
+          <p>{item.description}</p>
+          <p>{item.date_and_duration_string}</p>
+          <p>{item.location}</p>
+        </li>
+      ))}
+    </ul>
   );
 }

@@ -1,3 +1,5 @@
+import { normalizeScheduleItems } from "../utils/dateTime.js";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 export async function fetchScheduleItems() {
@@ -9,5 +11,5 @@ export async function fetchScheduleItems() {
 
   const data = await response.json();
 
-  return data.scheduleItems;
+  return normalizeScheduleItems(data.scheduleItems);
 }
