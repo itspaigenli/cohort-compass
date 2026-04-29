@@ -53,3 +53,33 @@ export const fallbackScheduleItems = [
     recording_url: null,
   },
 ];
+
+export const fallbackFaqEntries = [
+  {
+    id: 1,
+    question: "Why is my useEffect running twice?",
+    answer:
+      "In development, React Strict Mode may run effects more than once to help catch side-effect bugs. Check whether it only happens in development and review the dependency array.",
+    error_topic: "useEffect",
+    category: "React + Vite",
+    tags: ["useEffect", "debugging"],
+  },
+  {
+    id: 2,
+    question: "How do I fix a merge conflict?",
+    answer:
+      "Open the conflicted file, review the conflict markers, decide which code to keep, remove the markers, then add and commit the resolved file.",
+    error_topic: "merge conflict",
+    category: "Git & GitHub",
+    tags: ["merge conflict", "debugging"],
+  },
+  {
+    id: 3,
+    question: "Why is my fetch request failing?",
+    answer:
+      "Check the request URL, server status, CORS configuration, and whether errors are being handled with try/catch.",
+    error_topic: "fetch error",
+    category: "APIs",
+    tags: ["debugging"],
+  },
+];
