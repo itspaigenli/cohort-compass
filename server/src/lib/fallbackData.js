@@ -83,3 +83,18 @@ export const fallbackFaqEntries = [
     tags: ["debugging"],
   },
 ];
+
+export const fallbackReminders = [
+  {
+    id: 1,
+    text: "Review tomorrow's schedule before logging off.",
+    done: false,
+    due_at: "2026-04-22T17:30:00.000Z",
+  },
+  {
+    id: 2,
+    text: "Save one debugging note after each work session.",
+    done: true,
+    due_at: null,
+  },
+];
