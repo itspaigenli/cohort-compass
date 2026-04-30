@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { checkDatabaseConnection } from "./config/db.js";
+import faqRoutes from "./routes/faqRoutes.js";
 import linksRoutes from "./routes/linksRoutes.js";
 import scheduleRoutes from "./routes/scheduleRoutes.js";
 
@@ -17,6 +18,7 @@ app.use(
 
 app.use(express.json());
 
+app.use("/api/faq", faqRoutes);
 app.use("/api/links", linksRoutes);
 app.use("/api/schedule", scheduleRoutes);
 
