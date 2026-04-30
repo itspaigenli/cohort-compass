@@ -1,3 +1,4 @@
+import LinksPreview from "./components/dashboard/LinksPreview.jsx";
 import SchedulePreview from "./components/dashboard/SchedulePreview.jsx";
 
 function App() {
@@ -19,6 +20,15 @@ function App() {
       >
         <h2 id="schedule-heading">Upcoming Schedule</h2>
         <SchedulePreview />
+      </section>
+
+      <section
+        id="links"
+        className="links-section"
+        aria-labelledby="links-heading"
+      >
+        <h2 id="links-heading">Important Links</h2>
+        <LinksPreview />
       </section>
     </main>
   );
