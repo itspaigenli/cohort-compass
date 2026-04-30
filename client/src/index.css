@@ -73,7 +73,8 @@ select {
 
 .schedule-section,
 .links-section,
-.faq-section {
+.faq-section,
+.reminders-section {
   display: grid;
   gap: 1rem;
   margin-top: 1.5rem;
@@ -86,7 +87,8 @@ select {
 
 .schedule-section h2,
 .links-section h2,
-.faq-section h2 {
+.faq-section h2,
+.reminders-section h2 {
   margin: 0;
   color: #05556d;
   font-size: clamp(1.45rem, 3vw, 2rem);
@@ -94,7 +96,8 @@ select {
 
 .schedule-section ul,
 .links-section ul,
-.faq-section ul {
+.faq-section ul,
+.reminders-section ul {
   display: grid;
   gap: 0.85rem;
   margin: 0;
@@ -104,7 +107,8 @@ select {
 
 .schedule-section li,
 .links-section li,
-.faq-section li {
+.faq-section li,
+.reminders-section li {
   display: grid;
   gap: 0.35rem;
   padding: 1rem;
@@ -116,7 +120,8 @@ select {
 
 .schedule-section h3,
 .links-section h3,
-.faq-section h3 {
+.faq-section h3,
+.reminders-section h3 {
   margin: 0;
   color: #17313a;
   font-size: 1.1rem;
@@ -129,10 +134,29 @@ select {
 
 .schedule-section p,
 .links-section p,
-.faq-section p {
+.faq-section p,
+.reminders-section p {
   margin: 0;
   color: rgba(23, 49, 58, 0.72);
   line-height: 1.5;
+}
+
+.reminder-item-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #17313a;
+  font-weight: 700;
+}
+
+.reminders-section button {
+  width: fit-content;
+  border: 1px solid rgba(0, 147, 181, 0.2);
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  color: #05556d;
+  background: #ffffff;
+  cursor: pointer;
 }
 
 @media (max-width: 640px) {
@@ -147,7 +171,8 @@ select {
 
   .schedule-section,
   .links-section,
-  .faq-section {
+  .faq-section,
+  .reminders-section {
     padding: 1rem;
   }
 }

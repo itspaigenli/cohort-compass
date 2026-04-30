@@ -1,5 +1,6 @@
 import FaqPreview from "./components/dashboard/FaqPreview.jsx";
 import LinksPreview from "./components/dashboard/LinksPreview.jsx";
+import RemindersPanel from "./components/dashboard/RemindersPanel.jsx";
 import SchedulePreview from "./components/dashboard/SchedulePreview.jsx";
 
 function App() {
@@ -35,6 +36,15 @@ function App() {
       <section id="faq" className="faq-section" aria-labelledby="faq-heading">
         <h2 id="faq-heading">Debugging FAQ</h2>
         <FaqPreview />
+      </section>
+
+      <section
+        id="reminders"
+        className="reminders-section"
+        aria-labelledby="reminders-heading"
+      >
+        <h2 id="reminders-heading">Reminders</h2>
+        <RemindersPanel />
       </section>
     </main>
   );
