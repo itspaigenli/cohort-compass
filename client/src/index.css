@@ -72,7 +72,8 @@ select {
 }
 
 .schedule-section,
-.links-section {
+.links-section,
+.faq-section {
   display: grid;
   gap: 1rem;
   margin-top: 1.5rem;
@@ -84,14 +85,16 @@ select {
 }
 
 .schedule-section h2,
-.links-section h2 {
+.links-section h2,
+.faq-section h2 {
   margin: 0;
   color: #05556d;
   font-size: clamp(1.45rem, 3vw, 2rem);
 }
 
 .schedule-section ul,
-.links-section ul {
+.links-section ul,
+.faq-section ul {
   display: grid;
   gap: 0.85rem;
   margin: 0;
@@ -100,7 +103,8 @@ select {
 }
 
 .schedule-section li,
-.links-section li {
+.links-section li,
+.faq-section li {
   display: grid;
   gap: 0.35rem;
   padding: 1rem;
@@ -111,7 +115,8 @@ select {
 }
 
 .schedule-section h3,
-.links-section h3 {
+.links-section h3,
+.faq-section h3 {
   margin: 0;
   color: #17313a;
   font-size: 1.1rem;
@@ -123,7 +128,8 @@ select {
 }
 
 .schedule-section p,
-.links-section p {
+.links-section p,
+.faq-section p {
   margin: 0;
   color: rgba(23, 49, 58, 0.72);
   line-height: 1.5;
@@ -140,7 +146,8 @@ select {
   }
 
   .schedule-section,
-  .links-section {
+  .links-section,
+  .faq-section {
     padding: 1rem;
   }
 }

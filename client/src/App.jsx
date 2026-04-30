@@ -1,3 +1,4 @@
+import FaqPreview from "./components/dashboard/FaqPreview.jsx";
 import LinksPreview from "./components/dashboard/LinksPreview.jsx";
 import SchedulePreview from "./components/dashboard/SchedulePreview.jsx";
 
@@ -29,6 +30,11 @@ function App() {
       >
         <h2 id="links-heading">Important Links</h2>
         <LinksPreview />
+      </section>
+
+      <section id="faq" className="faq-section" aria-labelledby="faq-heading">
+        <h2 id="faq-heading">Debugging FAQ</h2>
+        <FaqPreview />
       </section>
     </main>
   );
