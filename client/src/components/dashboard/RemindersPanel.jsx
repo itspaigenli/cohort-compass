@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  createReminder,
   deleteReminder,
   fetchReminders,
   updateReminder,
@@ -28,6 +29,7 @@ function formatDueDate(value) {
 
 export default function RemindersPanel() {
   const [reminders, setReminders] = useState([]);
+  const [draftText, setDraftText] = useState("");
   const [status, setStatus] = useState("loading");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -46,6 +48,23 @@ export default function RemindersPanel() {
 
     loadReminders();
   }, []);
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    const text = draftText.trim();
+
+    if (!text) {
+      return;
+    }
+
+    const reminder = await createReminder({ text });
+
+    setReminders((currentReminders) =>
+      sortReminders([reminder, ...currentReminders]),
+    );
+    setDraftText("");
+  }
 
   async function handleToggle(reminder) {
     const updatedReminder = await updateReminder(reminder.id, {
@@ -77,30 +96,46 @@ export default function RemindersPanel() {
     return <p>{errorMessage}</p>;
   }
 
-  if (!reminders.length) {
-    return <p>No reminders yet.</p>;
-  }
-
   return (
-    <ul>
-      {reminders.map((reminder) => (
-        <li key={reminder.id}>
-          <label className="reminder-item-label">
-            <input
-              type="checkbox"
-              checked={reminder.done}
-              onChange={() => handleToggle(reminder)}
-            />
-            <span>{reminder.text}</span>
-          </label>
-          {formatDueDate(reminder.due_at) ? (
-            <p>Due {formatDueDate(reminder.due_at)}</p>
-          ) : null}
-          <button type="button" onClick={() => handleDelete(reminder.id)}>
-            Remove
-          </button>
-        </li>
-      ))}
-    </ul>
+    <>
+      <form className="reminders-form" onSubmit={handleSubmit}>
+        <label htmlFor="new-reminder">Add reminder</label>
+        <div className="reminders-form-row">
+          <input
+            id="new-reminder"
+            type="text"
+            value={draftText}
+            onChange={(event) => setDraftText(event.target.value)}
+            placeholder="Add your next task"
+          />
+          <button type="submit">Add</button>
+        </div>
+      </form>
+
+      {!reminders.length ? <p>No reminders yet.</p> : null}
+
+      {reminders.length ? (
+        <ul>
+          {reminders.map((reminder) => (
+            <li key={reminder.id}>
+              <label className="reminder-item-label">
+                <input
+                  type="checkbox"
+                  checked={reminder.done}
+                  onChange={() => handleToggle(reminder)}
+                />
+                <span>{reminder.text}</span>
+              </label>
+              {formatDueDate(reminder.due_at) ? (
+                <p>Due {formatDueDate(reminder.due_at)}</p>
+              ) : null}
+              <button type="button" onClick={() => handleDelete(reminder.id)}>
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </>
   );
 }
