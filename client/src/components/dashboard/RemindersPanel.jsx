@@ -32,6 +32,7 @@ export default function RemindersPanel() {
   const [draftText, setDraftText] = useState("");
   const [status, setStatus] = useState("loading");
   const [errorMessage, setErrorMessage] = useState("");
+  const [actionError, setActionError] = useState("");
 
   useEffect(() => {
     async function loadReminders() {
@@ -58,34 +59,49 @@ export default function RemindersPanel() {
       return;
     }
 
-    const reminder = await createReminder({ text });
+    try {
+      const reminder = await createReminder({ text });
 
-    setReminders((currentReminders) =>
-      sortReminders([reminder, ...currentReminders]),
-    );
-    setDraftText("");
+      setReminders((currentReminders) =>
+        sortReminders([reminder, ...currentReminders]),
+      );
+      setDraftText("");
+      setActionError("");
+    } catch {
+      setActionError("Unable to add that reminder right now.");
+    }
   }
 
   async function handleToggle(reminder) {
-    const updatedReminder = await updateReminder(reminder.id, {
-      done: !reminder.done,
-    });
+    try {
+      const updatedReminder = await updateReminder(reminder.id, {
+        done: !reminder.done,
+      });
 
-    setReminders((currentReminders) =>
-      sortReminders(
-        currentReminders.map((item) =>
-          item.id === updatedReminder.id ? updatedReminder : item,
+      setReminders((currentReminders) =>
+        sortReminders(
+          currentReminders.map((item) =>
+            item.id === updatedReminder.id ? updatedReminder : item,
+          ),
         ),
-      ),
-    );
+      );
+      setActionError("");
+    } catch {
+      setActionError("Unable to update that reminder right now.");
+    }
   }
 
   async function handleDelete(id) {
-    await deleteReminder(id);
+    try {
+      await deleteReminder(id);
 
-    setReminders((currentReminders) =>
-      currentReminders.filter((reminder) => reminder.id !== id),
-    );
+      setReminders((currentReminders) =>
+        currentReminders.filter((reminder) => reminder.id !== id),
+      );
+      setActionError("");
+    } catch {
+      setActionError("Unable to remove that reminder right now.");
+    }
   }
 
   if (status === "loading") {
@@ -112,6 +128,7 @@ export default function RemindersPanel() {
         </div>
       </form>
 
+      {actionError ? <p>{actionError}</p> : null}
       {!reminders.length ? <p>No reminders yet.</p> : null}
 
       {reminders.length ? (
