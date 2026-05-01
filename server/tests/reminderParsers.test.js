@@ -32,6 +32,9 @@ describe("reminder parsers", () => {
 
     it("rejects invalid due date values", () => {
       expect(parseDueAt("not a date")).toEqual({ ok: false });
+      expect(parseDueAt("2026-04-30")).toEqual({ ok: false });
+      expect(parseDueAt("2026-02-31")).toEqual({ ok: false });
+      expect(parseDueAt("2026-04-30T25:00:00.000Z")).toEqual({ ok: false });
       expect(parseDueAt(123)).toEqual({ ok: false });
     });
   });
