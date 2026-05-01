@@ -1,4 +1,5 @@
-import { query } from "../config/db.js";
+import { checkDatabaseConnection, query } from "../config/db.js";
+import { fallbackReminders } from "../lib/fallbackData.js";
 
 const reminderFields = `
   id,
@@ -10,6 +11,12 @@ const reminderFields = `
 `;
 
 export async function listReminders() {
+  const databaseConnected = await checkDatabaseConnection();
+
+  if (!databaseConnected) {
+    return fallbackReminders;
+  }
+
   const result = await query(
     `SELECT ${reminderFields}
     FROM reminders

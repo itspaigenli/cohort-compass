@@ -1,4 +1,3 @@
-import { fallbackFaqEntries } from "../lib/fallbackData.js";
 import { listFaqEntries } from "../models/faqModel.js";
 
 export async function getFaqEntries(req, res) {
@@ -9,9 +8,6 @@ export async function getFaqEntries(req, res) {
   } catch (error) {
     console.error("Error fetching FAQ entries:", error);
 
-    res.json({
-      faqEntries: fallbackFaqEntries,
-      source: "fallback",
-    });
+    res.status(500).json({ error: "Unable to fetch FAQ entries." });
   }
 }

@@ -1,4 +1,3 @@
-import { fallbackReminders } from "../lib/fallbackData.js";
 import {
   createReminder,
   deleteReminder,
@@ -15,10 +14,7 @@ export async function getReminders(req, res) {
   } catch (error) {
     console.error("Error fetching reminders:", error);
 
-    res.json({
-      reminders: fallbackReminders,
-      source: "fallback",
-    });
+    res.status(500).json({ error: "Unable to fetch reminders." });
   }
 }
 

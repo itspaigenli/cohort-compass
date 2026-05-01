@@ -1,6 +1,13 @@
-import { query } from "../config/db.js";
+import { checkDatabaseConnection, query } from "../config/db.js";
+import { fallbackLinks } from "../lib/fallbackData.js";
 
 export async function listLinks() {
+  const databaseConnected = await checkDatabaseConnection();
+
+  if (!databaseConnected) {
+    return fallbackLinks;
+  }
+
   const result = await query(
     `SELECT
       important_links.id,

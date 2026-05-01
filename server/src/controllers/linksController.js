@@ -1,4 +1,3 @@
-import { fallbackLinks } from "../lib/fallbackData.js";
 import { listLinks } from "../models/linksModel.js";
 
 export async function getLinks(req, res) {
@@ -9,9 +8,6 @@ export async function getLinks(req, res) {
   } catch (error) {
     console.error("Error fetching important links:", error);
 
-    res.json({
-      links: fallbackLinks,
-      source: "fallback",
-    });
+    res.status(500).json({ error: "Unable to fetch important links." });
   }
 }
