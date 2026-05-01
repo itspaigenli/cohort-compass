@@ -71,7 +71,10 @@ select {
   line-height: 1.6;
 }
 
-.schedule-section {
+.schedule-section,
+.links-section,
+.faq-section,
+.reminders-section {
   display: grid;
   gap: 1rem;
   margin-top: 1.5rem;
@@ -82,13 +85,19 @@ select {
   box-shadow: 0 18px 42px rgba(5, 85, 109, 0.09);
 }
 
-.schedule-section h2 {
+.schedule-section h2,
+.links-section h2,
+.faq-section h2,
+.reminders-section h2 {
   margin: 0;
   color: #05556d;
   font-size: clamp(1.45rem, 3vw, 2rem);
 }
 
-.schedule-section ul {
+.schedule-section ul,
+.links-section ul,
+.faq-section ul,
+.reminders-section ul {
   display: grid;
   gap: 0.85rem;
   margin: 0;
@@ -96,7 +105,10 @@ select {
   list-style: none;
 }
 
-.schedule-section li {
+.schedule-section li,
+.links-section li,
+.faq-section li,
+.reminders-section li {
   display: grid;
   gap: 0.35rem;
   padding: 1rem;
@@ -106,16 +118,70 @@ select {
   background: #ffffff;
 }
 
-.schedule-section h3 {
+.schedule-section h3,
+.links-section h3,
+.faq-section h3,
+.reminders-section h3 {
   margin: 0;
   color: #17313a;
   font-size: 1.1rem;
 }
 
-.schedule-section p {
+.links-section a {
+  color: #05556d;
+  text-decoration-color: rgba(252, 118, 37, 0.5);
+}
+
+.schedule-section p,
+.links-section p,
+.faq-section p,
+.reminders-section p {
   margin: 0;
   color: rgba(23, 49, 58, 0.72);
   line-height: 1.5;
+}
+
+.reminder-item-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #17313a;
+  font-weight: 700;
+}
+
+.reminders-form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.reminders-form label {
+  color: #17313a;
+  font-weight: 700;
+}
+
+.reminders-form-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.reminders-form input {
+  min-width: 0;
+  flex: 1;
+  border: 1px solid rgba(0, 147, 181, 0.2);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  color: #17313a;
+  background: #ffffff;
+}
+
+.reminders-section button {
+  width: fit-content;
+  border: 1px solid rgba(0, 147, 181, 0.2);
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  color: #05556d;
+  background: #ffffff;
+  cursor: pointer;
 }
 
 @media (max-width: 640px) {
@@ -128,7 +194,14 @@ select {
     padding: 2rem 0 1rem;
   }
 
-  .schedule-section {
+  .schedule-section,
+  .links-section,
+  .faq-section,
+  .reminders-section {
     padding: 1rem;
+  }
+
+  .reminders-form-row {
+    flex-direction: column;
   }
 }

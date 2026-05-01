@@ -30,7 +30,7 @@ app.get("/", async (req, res) => {
   res.json({
     message: "Cohort Compass server is running",
     databaseConnected,
-    mode: databaseConnected ? "database" : "db-fallback",
+    mode: databaseConnected ? "database" : "database-unavailable",
   });
 });
 
