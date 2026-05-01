@@ -1,13 +1,6 @@
-import { checkDatabaseConnection, query } from "../config/db.js";
-import { fallbackScheduleItems } from "../lib/fallbackData.js";
+import { query } from "../config/db.js";
 
 export async function listScheduleItems() {
-  const databaseConnected = await checkDatabaseConnection();
-
-  if (!databaseConnected) {
-    return fallbackScheduleItems;
-  }
-
   const result = await query(
     `SELECT
       id,
