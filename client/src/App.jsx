@@ -3,6 +3,17 @@ import LinksPreview from "./components/dashboard/LinksPreview.jsx";
 import RemindersPanel from "./components/dashboard/RemindersPanel.jsx";
 import SchedulePreview from "./components/dashboard/SchedulePreview.jsx";
 
+function DashboardSection({ id, className, title, children }) {
+  const headingId = `${id}-heading`;
+
+  return (
+    <section id={id} className={className} aria-labelledby={headingId}>
+      <h2 id={headingId}>{title}</h2>
+      {children}
+    </section>
+  );
+}
+
 function App() {
   return (
     <main className="app-shell">
@@ -22,37 +33,37 @@ function App() {
         <a href="#reminders">Reminders</a>
       </nav>
 
-      <section
+      <DashboardSection
         id="schedule"
         className="schedule-section"
-        aria-labelledby="schedule-heading"
+        title="Upcoming Schedule"
       >
-        <h2 id="schedule-heading">Upcoming Schedule</h2>
         <SchedulePreview />
-      </section>
+      </DashboardSection>
 
-      <section
+      <DashboardSection
         id="links"
         className="links-section"
-        aria-labelledby="links-heading"
+        title="Important Links"
       >
-        <h2 id="links-heading">Important Links</h2>
         <LinksPreview />
-      </section>
+      </DashboardSection>
 
-      <section id="faq" className="faq-section" aria-labelledby="faq-heading">
-        <h2 id="faq-heading">Debugging FAQ</h2>
+      <DashboardSection
+        id="faq"
+        className="faq-section"
+        title="Debugging FAQ"
+      >
         <FaqPreview />
-      </section>
+      </DashboardSection>
 
-      <section
+      <DashboardSection
         id="reminders"
         className="reminders-section"
-        aria-labelledby="reminders-heading"
+        title="Reminders"
       >
-        <h2 id="reminders-heading">Reminders</h2>
         <RemindersPanel />
-      </section>
+      </DashboardSection>
     </main>
   );
 }
