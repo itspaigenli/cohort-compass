@@ -43,6 +43,7 @@ describe("RemindersPanel", () => {
 
     const checkboxes = await screen.findAllByRole("checkbox");
 
+    expect(screen.getByText(/1 remaining · 1 completed/i)).toBeInTheDocument();
     expect(checkboxes[0]).toHaveAccessibleName(/submit milestone summary/i);
     expect(checkboxes[0]).not.toBeChecked();
     expect(checkboxes[1]).toHaveAccessibleName(/review readme links/i);
