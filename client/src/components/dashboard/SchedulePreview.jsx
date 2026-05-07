@@ -40,8 +40,14 @@ export default function SchedulePreview() {
         <li key={item.id}>
           <h3>{item.title}</h3>
           <p>{item.description}</p>
-          <p>{item.date_and_duration_string}</p>
-          <p>{item.location}</p>
+          <p>
+            <strong>When:</strong> {item.date_and_duration_string}
+          </p>
+          {item.location ? (
+            <p>
+              <strong>Where:</strong> {item.location}
+            </p>
+          ) : null}
         </li>
       ))}
     </ul>
