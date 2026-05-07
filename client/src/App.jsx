@@ -33,6 +33,17 @@ function App() {
         <a href="#reminders">Reminders</a>
       </nav>
 
+      <section className="quick-find" aria-labelledby="quick-find-heading">
+        <p className="eyebrow">Find what you need</p>
+        <h2 id="quick-find-heading">What are you looking for?</h2>
+        <div className="quick-find-links">
+          <a href="#schedule">Today&apos;s schedule</a>
+          <a href="#links">Program links</a>
+          <a href="#faq">Debugging help</a>
+          <a href="#reminders">My reminders</a>
+        </div>
+      </section>
+
       <DashboardSection
         id="schedule"
         className="schedule-section"
