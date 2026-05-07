@@ -33,7 +33,9 @@ describe("SchedulePreview", () => {
     expect(
       screen.getByText(/practice interview questions/i),
     ).toBeInTheDocument();
+    expect(screen.getByText(/when:/i)).toBeInTheDocument();
     expect(screen.getByText(/may 7, 10:00 am/i)).toBeInTheDocument();
+    expect(screen.getByText(/where:/i)).toBeInTheDocument();
     expect(screen.getByText(/zoom/i)).toBeInTheDocument();
   });
 
