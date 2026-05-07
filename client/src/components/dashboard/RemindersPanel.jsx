@@ -33,6 +33,8 @@ export default function RemindersPanel() {
   const [status, setStatus] = useState("loading");
   const [errorMessage, setErrorMessage] = useState("");
   const [actionError, setActionError] = useState("");
+  const completedCount = reminders.filter((reminder) => reminder.done).length;
+  const remainingCount = reminders.length - completedCount;
 
   useEffect(() => {
     async function loadReminders() {
@@ -132,26 +134,31 @@ export default function RemindersPanel() {
       {!reminders.length ? <p>No reminders yet.</p> : null}
 
       {reminders.length ? (
-        <ul>
-          {reminders.map((reminder) => (
-            <li key={reminder.id}>
-              <label className="reminder-item-label">
-                <input
-                  type="checkbox"
-                  checked={reminder.done}
-                  onChange={() => handleToggle(reminder)}
-                />
-                <span>{reminder.text}</span>
-              </label>
-              {formatDueDate(reminder.due_at) ? (
-                <p>Due {formatDueDate(reminder.due_at)}</p>
-              ) : null}
-              <button type="button" onClick={() => handleDelete(reminder.id)}>
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
+        <>
+          <p>
+            {remainingCount} remaining · {completedCount} completed
+          </p>
+          <ul>
+            {reminders.map((reminder) => (
+              <li key={reminder.id}>
+                <label className="reminder-item-label">
+                  <input
+                    type="checkbox"
+                    checked={reminder.done}
+                    onChange={() => handleToggle(reminder)}
+                  />
+                  <span>{reminder.text}</span>
+                </label>
+                {formatDueDate(reminder.due_at) ? (
+                  <p>Due {formatDueDate(reminder.due_at)}</p>
+                ) : null}
+                <button type="button" onClick={() => handleDelete(reminder.id)}>
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
       ) : null}
     </>
   );
