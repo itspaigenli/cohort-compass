@@ -15,6 +15,13 @@ function App() {
         </p>
       </header>
 
+      <nav className="section-nav" aria-label="Main sections">
+        <a href="#schedule">Schedule</a>
+        <a href="#links">Links</a>
+        <a href="#faq">FAQ</a>
+        <a href="#reminders">Reminders</a>
+      </nav>
+
       <section
         id="schedule"
         className="schedule-section"
