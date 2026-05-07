@@ -48,6 +48,11 @@ export default function SchedulePreview() {
               <strong>Where:</strong> {item.location}
             </p>
           ) : null}
+          {item.meeting_url ? (
+            <a href={item.meeting_url} target="_blank" rel="noreferrer">
+              Open meeting
+            </a>
+          ) : null}
         </li>
       ))}
     </ul>
