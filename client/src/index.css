@@ -95,6 +95,47 @@ select {
   outline: none;
 }
 
+.quick-find {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(0, 147, 181, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.quick-find h2 {
+  margin: 0;
+  color: #05556d;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+}
+
+.quick-find-links {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.quick-find-links a {
+  border: 1px solid rgba(0, 147, 181, 0.14);
+  border-left: 4px solid #fc7625;
+  border-radius: 8px;
+  padding: 0.85rem;
+  color: #17313a;
+  background: #ffffff;
+  font-weight: 700;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.quick-find-links a:hover,
+.quick-find-links a:focus {
+  border-color: rgba(252, 118, 37, 0.5);
+  color: #05556d;
+  outline: none;
+}
+
 .schedule-section,
 .links-section,
 .faq-section,
@@ -227,11 +268,16 @@ select {
     text-align: center;
   }
 
+  .quick-find,
   .schedule-section,
   .links-section,
   .faq-section,
   .reminders-section {
     padding: 1rem;
+  }
+
+  .quick-find-links {
+    grid-template-columns: 1fr;
   }
 
   .reminders-form-row {
