@@ -21,6 +21,7 @@ describe("SchedulePreview", () => {
         description: "Practice interview questions with the cohort.",
         date_and_duration_string: "May 7, 10:00 AM - May 7, 11:00 AM",
         location: "Zoom",
+        meeting_url: "https://example.com/meeting",
       },
     ]);
 
@@ -37,6 +38,10 @@ describe("SchedulePreview", () => {
     expect(screen.getByText(/may 7, 10:00 am/i)).toBeInTheDocument();
     expect(screen.getByText(/where:/i)).toBeInTheDocument();
     expect(screen.getByText(/zoom/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /open meeting/i })).toHaveAttribute(
+      "href",
+      "https://example.com/meeting",
+    );
   });
 
   it("renders an empty message when no schedule items are returned", async () => {
