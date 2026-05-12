@@ -19,6 +19,32 @@ vi.mock("./components/dashboard/RemindersPanel.jsx", () => ({
 }));
 
 describe("App", () => {
+  it("renders the homepage shell with the main dashboard sections", () => {
+    // Arrange
+    render(<App />);
+
+    // Act
+    // No user action is needed because the homepage shell renders on page load.
+
+    // Assert
+    expect(screen.getByRole("main")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /cohort compass/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /upcoming schedule/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /important links/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /debugging faq/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /^reminders$/i }),
+    ).toBeInTheDocument();
+  });
+
   it("renders the main homepage navigation links", () => {
     // Arrange
     render(<App />);
