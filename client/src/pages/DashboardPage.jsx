@@ -27,6 +27,7 @@ export default function DashboardPage() {
       </header>
 
       <nav className="section-nav" aria-label="Main sections">
+        <a href="#search">Search student hub</a>
         <a href="#schedule">Schedule</a>
         <a href="#links">Links</a>
         <a href="#faq">FAQ</a>
