@@ -66,4 +66,17 @@ describe("DashboardPage", () => {
       screen.getByRole("heading", { name: /^reminders$/i }),
     ).toBeInTheDocument();
   });
+
+  it("links to the search page from the homepage", () => {
+    // Arrange
+    render(<DashboardPage />);
+
+    // Act
+    // No user action is needed because the search link renders on page load.
+
+    // Assert
+    expect(
+      screen.getByRole("link", { name: /search student hub/i }),
+    ).toHaveAttribute("href", "#search");
+  });
 });
