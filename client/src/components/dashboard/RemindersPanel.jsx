@@ -139,24 +139,29 @@ export default function RemindersPanel() {
             {remainingCount} remaining · {completedCount} completed
           </p>
           <ul>
-            {reminders.map((reminder) => (
-              <li key={reminder.id}>
-                <label className="reminder-item-label">
-                  <input
-                    type="checkbox"
-                    checked={reminder.done}
-                    onChange={() => handleToggle(reminder)}
-                  />
-                  <span>{reminder.text}</span>
-                </label>
-                {formatDueDate(reminder.due_at) ? (
-                  <p>Due {formatDueDate(reminder.due_at)}</p>
-                ) : null}
-                <button type="button" onClick={() => handleDelete(reminder.id)}>
-                  Remove
-                </button>
-              </li>
-            ))}
+            {reminders.map((reminder) => {
+              const dueDate = formatDueDate(reminder.due_at);
+
+              return (
+                <li key={reminder.id}>
+                  <label className="reminder-item-label">
+                    <input
+                      type="checkbox"
+                      checked={reminder.done}
+                      onChange={() => handleToggle(reminder)}
+                    />
+                    <span>{reminder.text}</span>
+                  </label>
+                  {dueDate ? <p>Due {dueDate}</p> : null}
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(reminder.id)}
+                  >
+                    Remove
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </>
       ) : null}
