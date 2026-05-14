@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import SearchPage from "./SearchPage.jsx";
 
@@ -31,5 +31,49 @@ describe("SearchPage", () => {
 
     // Assert
     expect(screen.getByText(/you searched for react hooks/i)).toBeInTheDocument();
+  });
+
+  it("shows matching search results in clear groups", () => {
+    // Arrange
+    render(<SearchPage />);
+
+    // Act
+    fireEvent.change(
+      screen.getByRole("searchbox", { name: /search the student hub/i }),
+      {
+        target: { value: "react" },
+      },
+    );
+    fireEvent.click(screen.getByRole("button", { name: /search/i }));
+
+    const resourcesGroup = screen.getByRole("region", {
+      name: /resources/i,
+    });
+    const faqGroup = screen.getByRole("region", {
+      name: /faq/i,
+    });
+
+    // Assert
+    expect(within(resourcesGroup).getByText(/react docs/i)).toBeInTheDocument();
+    expect(
+      within(faqGroup).getByText(/how do i manage react state/i),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a friendly empty state when there are no search matches", () => {
+    // Arrange
+    render(<SearchPage />);
+
+    // Act
+    fireEvent.change(
+      screen.getByRole("searchbox", { name: /search the student hub/i }),
+      {
+        target: { value: "database" },
+      },
+    );
+    fireEvent.click(screen.getByRole("button", { name: /search/i }));
+
+    // Assert
+    expect(screen.getByText(/no results found for database/i)).toBeInTheDocument();
   });
 });
