@@ -44,7 +44,11 @@ export default function LinksPreview() {
             </a>
           </h3>
           <p>{link.description}</p>
-          <p>{link.category}</p>
+          {link.category ? (
+            <p>
+              <strong>Category:</strong> {link.category}
+            </p>
+          ) : null}
         </li>
       ))}
     </ul>
