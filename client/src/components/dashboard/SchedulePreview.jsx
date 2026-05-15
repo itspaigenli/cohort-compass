@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchScheduleItems } from "../../services/scheduleApi.js";
 
-export default function SchedulePreview() {
+export default function SchedulePreview({ onScheduleItemsLoaded }) {
   const [scheduleItems, setScheduleItems] = useState([]);
   const [status, setStatus] = useState("loading");
   const [errorMessage, setErrorMessage] = useState("");
@@ -12,6 +12,7 @@ export default function SchedulePreview() {
         const items = await fetchScheduleItems();
 
         setScheduleItems(items);
+        onScheduleItemsLoaded?.(items);
         setStatus("success");
       } catch (error) {
         setErrorMessage(error.message);
@@ -20,7 +21,7 @@ export default function SchedulePreview() {
     }
 
     loadScheduleItems();
-  }, []);
+  }, [onScheduleItemsLoaded]);
 
   if (status === "loading") {
     return <p>Loading schedule...</p>;

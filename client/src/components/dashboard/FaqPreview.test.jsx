@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import FaqPreview from "./FaqPreview.jsx";
 import { fetchFaqEntries } from "../../services/faqApi.js";
@@ -59,5 +59,41 @@ describe("FaqPreview", () => {
     await waitFor(() => {
       expect(screen.getByText(/faq request failed/i)).toBeInTheDocument();
     });
+  });
+
+  it("filters FAQ entries by typed search text", async () => {
+    // Arrange
+    fetchFaqEntries.mockResolvedValue([
+      {
+        id: 1,
+        question: "Why is my fetch request failing?",
+        answer: "Check the request URL and server status.",
+        category: "APIs",
+      },
+      {
+        id: 2,
+        question: "How do I fix a merge conflict?",
+        answer: "Review the conflict markers and choose what to keep.",
+        category: "Git & GitHub",
+      },
+    ]);
+
+    render(<FaqPreview />);
+
+    // Act
+    fireEvent.change(
+      await screen.findByRole("searchbox", { name: /filter faq entries/i }),
+      {
+        target: { value: "merge" },
+      },
+    );
+
+    // Assert
+    expect(
+      screen.queryByText(/why is my fetch request failing/i),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/how do i fix a merge conflict/i),
+    ).toBeInTheDocument();
   });
 });
