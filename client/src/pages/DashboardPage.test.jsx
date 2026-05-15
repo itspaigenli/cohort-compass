@@ -1,16 +1,19 @@
 import { render, screen, within } from "@testing-library/react";
+import { useEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
 import DashboardPage from "./DashboardPage.jsx";
 
 vi.mock("../components/dashboard/SchedulePreview.jsx", () => ({
   default: ({ onScheduleItemsLoaded }) => {
-    onScheduleItemsLoaded?.([
-      {
-        id: 1,
-        title: "Project Share",
-        start_time: "2026-05-15T19:30:00.000Z",
-      },
-    ]);
+    useEffect(() => {
+      onScheduleItemsLoaded?.([
+        {
+          id: 1,
+          title: "Project Share",
+          start_time: "2026-05-15T19:30:00.000Z",
+        },
+      ]);
+    }, [onScheduleItemsLoaded]);
 
     return <p>Schedule preview test content</p>;
   },
@@ -96,7 +99,7 @@ describe("DashboardPage", () => {
     ).toHaveAttribute("href", "#search");
   });
 
-  it("renders the monthly calendar on the dashboard", () => {
+  it("renders the monthly calendar on the dashboard", async () => {
     // Arrange
     render(<DashboardPage />);
 
@@ -105,7 +108,7 @@ describe("DashboardPage", () => {
 
     // Assert
     expect(
-      screen.getByText(/monthly calendar received 1 schedule item/i),
+      await screen.findByText(/monthly calendar received 1 schedule item/i),
     ).toBeInTheDocument();
   });
 });

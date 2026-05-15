@@ -1,3 +1,4 @@
+import { useState } from "react";
 import FaqPreview from "../components/dashboard/FaqPreview.jsx";
 import LinksPreview from "../components/dashboard/LinksPreview.jsx";
 import MonthlyCalendar from "../components/dashboard/MonthlyCalendar.jsx";
@@ -16,6 +17,8 @@ function DashboardSection({ id, className, title, children }) {
 }
 
 export default function DashboardPage() {
+  const [scheduleItems, setScheduleItems] = useState([]);
+
   return (
     <>
       <header className="hero">
@@ -51,8 +54,12 @@ export default function DashboardPage() {
         className="schedule-section"
         title="Upcoming Schedule"
       >
-        <MonthlyCalendar year={2026} monthIndex={4} />
-        <SchedulePreview />
+        <MonthlyCalendar
+          year={2026}
+          monthIndex={4}
+          scheduleItems={scheduleItems}
+        />
+        <SchedulePreview onScheduleItemsLoaded={setScheduleItems} />
       </DashboardSection>
 
       <DashboardSection
