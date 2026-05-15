@@ -63,4 +63,19 @@ describe("searchLinksAndFaq", () => {
     expect(query.mock.calls[0][1]).toEqual(["%react%"]);
     expect(query.mock.calls[1][1]).toEqual(["%react%"]);
   });
+
+  it("returns empty groups when the search term is blank", async () => {
+    // Arrange
+    const blankSearchTerm = "   ";
+
+    // Act
+    const results = await searchLinksAndFaq(blankSearchTerm);
+
+    // Assert
+    expect(results).toEqual({
+      links: [],
+      faqEntries: [],
+    });
+    expect(query).not.toHaveBeenCalled();
+  });
 });
