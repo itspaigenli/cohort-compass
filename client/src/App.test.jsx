@@ -10,6 +10,10 @@ vi.mock("./pages/SearchPage.jsx", () => ({
   default: () => <p>Search page test content</p>,
 }));
 
+vi.mock("./pages/FAQPage.jsx", () => ({
+  default: () => <p>FAQ page test content</p>,
+}));
+
 describe("App", () => {
   it("renders the dashboard page inside the app shell", () => {
     // Arrange
@@ -33,5 +37,17 @@ describe("App", () => {
     // Assert
     expect(screen.getByRole("main")).toBeInTheDocument();
     expect(screen.getByText(/search page test content/i)).toBeInTheDocument();
+  });
+
+  it("renders the FAQ page when the hash is faq", () => {
+    // Arrange
+    window.location.hash = "#faq";
+
+    // Act
+    render(<App />);
+
+    // Assert
+    expect(screen.getByRole("main")).toBeInTheDocument();
+    expect(screen.getByText(/faq page test content/i)).toBeInTheDocument();
   });
 });
