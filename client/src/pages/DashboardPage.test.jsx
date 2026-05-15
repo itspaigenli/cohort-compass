@@ -3,11 +3,23 @@ import { describe, expect, it, vi } from "vitest";
 import DashboardPage from "./DashboardPage.jsx";
 
 vi.mock("../components/dashboard/SchedulePreview.jsx", () => ({
-  default: () => <p>Schedule preview test content</p>,
+  default: ({ onScheduleItemsLoaded }) => {
+    onScheduleItemsLoaded?.([
+      {
+        id: 1,
+        title: "Project Share",
+        start_time: "2026-05-15T19:30:00.000Z",
+      },
+    ]);
+
+    return <p>Schedule preview test content</p>;
+  },
 }));
 
 vi.mock("../components/dashboard/MonthlyCalendar.jsx", () => ({
-  default: () => <p>Monthly calendar test content</p>,
+  default: ({ scheduleItems = [] }) => (
+    <p>Monthly calendar received {scheduleItems.length} schedule item</p>
+  ),
 }));
 
 vi.mock("../components/dashboard/LinksPreview.jsx", () => ({
@@ -92,6 +104,8 @@ describe("DashboardPage", () => {
     // No user action is needed because the calendar renders with the dashboard.
 
     // Assert
-    expect(screen.getByText(/monthly calendar test content/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/monthly calendar received 1 schedule item/i),
+    ).toBeInTheDocument();
   });
 });
