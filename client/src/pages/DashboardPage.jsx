@@ -1,5 +1,6 @@
 import FaqPreview from "../components/dashboard/FaqPreview.jsx";
 import LinksPreview from "../components/dashboard/LinksPreview.jsx";
+import MonthlyCalendar from "../components/dashboard/MonthlyCalendar.jsx";
 import RemindersPanel from "../components/dashboard/RemindersPanel.jsx";
 import SchedulePreview from "../components/dashboard/SchedulePreview.jsx";
 
@@ -50,6 +51,7 @@ export default function DashboardPage() {
         className="schedule-section"
         title="Upcoming Schedule"
       >
+        <MonthlyCalendar year={2026} monthIndex={4} />
         <SchedulePreview />
       </DashboardSection>
 
