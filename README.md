@@ -14,7 +14,7 @@ Cohort Compass is a PERN student hub for Techtonica participants. It helps stude
 ## MVP Features
 
 - Dashboard homepage with schedule, links, FAQ, reminders, and search navigation
-- Search page with typed search, submitted search state, grouped results, and empty state
+- Search page backed by `/api/search`, with typed search, grouped results, and empty state
 - Backend `/api/search` endpoint for searching important links and FAQ entries
 - FAQ page with real FAQ entries and client-side filtering
 - Important links and FAQ data loaded from the backend

@@ -1,66 +1,65 @@
 import { useState } from "react";
+import { searchStudentHub } from "../services/searchApi.js";
 
-const searchGroups = [
-  {
-    title: "Resources",
-    items: [
-      {
-        title: "React Docs",
-        description: "Official React documentation for components and hooks.",
-        keywords: ["react", "hooks", "components"],
-      },
-      {
-        title: "Program Links",
-        description: "Common links students use during the cohort.",
-        keywords: ["links", "resources", "program"],
-      },
-    ],
-  },
-  {
-    title: "FAQ",
-    items: [
-      {
-        title: "How do I manage React state?",
-        description: "Use state when a component needs to remember changing data.",
-        keywords: ["react", "state", "hooks"],
-      },
-      {
-        title: "Where do I find debugging help?",
-        description: "Start with the debugging FAQ and examples from class.",
-        keywords: ["debugging", "errors", "faq"],
-      },
-    ],
-  },
-];
+function buildSearchGroups(results) {
+  const groups = [];
 
-function getMatchingGroups(query) {
-  const normalizedQuery = query.trim().toLowerCase();
-
-  if (!normalizedQuery) {
-    return [];
+  if (results.links?.length) {
+    groups.push({
+      title: "Links",
+      items: results.links.map((link) => ({
+        title: link.title,
+        description: link.description,
+      })),
+    });
   }
 
-  return searchGroups
-    .map((group) => ({
-      ...group,
-      items: group.items.filter((item) =>
-        [item.title, item.description, ...item.keywords]
-          .join(" ")
-          .toLowerCase()
-          .includes(normalizedQuery),
-      ),
-    }))
-    .filter((group) => group.items.length > 0);
+  if (results.faqEntries?.length) {
+    groups.push({
+      title: "FAQ",
+      items: results.faqEntries.map((entry) => ({
+        title: entry.question,
+        description: entry.answer,
+      })),
+    });
+  }
+
+  return groups;
 }
 
 export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedSearchTerm, setSubmittedSearchTerm] = useState("");
-  const matchingGroups = getMatchingGroups(submittedSearchTerm);
+  const [matchingGroups, setMatchingGroups] = useState([]);
+  const [status, setStatus] = useState("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    setSubmittedSearchTerm(searchTerm);
+
+    const trimmedSearchTerm = searchTerm.trim();
+
+    if (!trimmedSearchTerm) {
+      setSubmittedSearchTerm("");
+      setMatchingGroups([]);
+      setStatus("idle");
+      return;
+    }
+
+    setSubmittedSearchTerm(trimmedSearchTerm);
+    setStatus("loading");
+    setErrorMessage("");
+
+    try {
+      const results = await searchStudentHub(trimmedSearchTerm);
+
+      setMatchingGroups(buildSearchGroups(results));
+      setStatus("success");
+    } catch (error) {
+      setErrorMessage(error.message);
+      setMatchingGroups([]);
+      setStatus("error");
+    }
   }
 
   return (
@@ -80,7 +79,9 @@ export default function SearchPage() {
       {submittedSearchTerm ? (
         <>
           <p>You searched for {submittedSearchTerm}</p>
-          {matchingGroups.length > 0 ? (
+          {status === "loading" ? <p>Loading search results...</p> : null}
+          {status === "error" ? <p>{errorMessage}</p> : null}
+          {status === "success" && matchingGroups.length > 0 ? (
             <div>
               {matchingGroups.map((group) => {
                 const headingId = `${group.title.toLowerCase()}-results-heading`;
@@ -100,9 +101,10 @@ export default function SearchPage() {
                 );
               })}
             </div>
-          ) : (
+          ) : null}
+          {status === "success" && matchingGroups.length === 0 ? (
             <p>No results found for {submittedSearchTerm}</p>
-          )}
+          ) : null}
         </>
       ) : null}
     </section>
