@@ -6,6 +6,10 @@ vi.mock("../components/dashboard/SchedulePreview.jsx", () => ({
   default: () => <p>Schedule preview test content</p>,
 }));
 
+vi.mock("../components/dashboard/MonthlyCalendar.jsx", () => ({
+  default: () => <p>Monthly calendar test content</p>,
+}));
+
 vi.mock("../components/dashboard/LinksPreview.jsx", () => ({
   default: () => <p>Links preview test content</p>,
 }));
@@ -78,5 +82,16 @@ describe("DashboardPage", () => {
     expect(
       screen.getByRole("link", { name: /search student hub/i }),
     ).toHaveAttribute("href", "#search");
+  });
+
+  it("renders the monthly calendar on the dashboard", () => {
+    // Arrange
+    render(<DashboardPage />);
+
+    // Act
+    // No user action is needed because the calendar renders with the dashboard.
+
+    // Assert
+    expect(screen.getByText(/monthly calendar test content/i)).toBeInTheDocument();
   });
 });
