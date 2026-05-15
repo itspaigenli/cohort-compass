@@ -1,7 +1,16 @@
 import { query } from "../config/db.js";
 
 export async function searchLinksAndFaq(searchTerm) {
-  const searchPattern = `%${searchTerm.trim().toLowerCase()}%`;
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+
+  if (!normalizedSearchTerm) {
+    return {
+      links: [],
+      faqEntries: [],
+    };
+  }
+
+  const searchPattern = `%${normalizedSearchTerm}%`;
 
   const linksResult = await query(
     `SELECT
