@@ -21,15 +21,21 @@ const clientBuildPath = path.join(__dirname, "../../client/dist");
 const app = express();
 const allowedClientOrigins = [
   process.env.CLIENT_ORIGIN,
+  process.env.RENDER_EXTERNAL_URL,
+  "https://cohort-compass.onrender.com",
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
 ].filter(Boolean);
 
+export function isAllowedClientOrigin(origin) {
+  return !origin || allowedClientOrigins.includes(origin);
+}
+
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedClientOrigins.includes(origin)) {
+      if (isAllowedClientOrigin(origin)) {
         callback(null, true);
         return;
       }
