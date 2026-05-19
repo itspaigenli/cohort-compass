@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { query } from "../src/config/db.js";
+import { listContentDocuments } from "../src/models/contentModel.js";
 import { listCurriculumReferences } from "../src/models/curriculumModel.js";
 import { searchLinksAndFaq } from "../src/models/searchModel.js";
 
@@ -11,13 +12,18 @@ vi.mock("../src/models/curriculumModel.js", () => ({
   listCurriculumReferences: vi.fn(),
 }));
 
+vi.mock("../src/models/contentModel.js", () => ({
+  listContentDocuments: vi.fn(),
+}));
+
 describe("searchLinksAndFaq", () => {
   beforeEach(() => {
     query.mockReset();
+    listContentDocuments.mockReset();
     listCurriculumReferences.mockReset();
   });
 
-  it("returns matching links, FAQ entries, and curriculum references", async () => {
+  it("returns matching links, FAQ entries, curriculum references, and content docs", async () => {
     // Arrange
     query
       .mockResolvedValueOnce({
@@ -52,6 +58,14 @@ describe("searchLinksAndFaq", () => {
         summary: "Techtonica React curriculum reference.",
       },
     ]);
+    listContentDocuments.mockResolvedValue([
+      {
+        slug: "react/debugging",
+        title: "React Debugging Notes",
+        relativePath: "docs/react/debugging.md",
+        summary: "Compass content notes for React debugging.",
+      },
+    ]);
 
     // Act
     const results = await searchLinksAndFaq("react");
@@ -65,11 +79,14 @@ describe("searchLinksAndFaq", () => {
     );
     expect(results.curriculumReferences).toHaveLength(1);
     expect(results.curriculumReferences[0].title).toBe("React JS");
+    expect(results.contentDocuments).toHaveLength(1);
+    expect(results.contentDocuments[0].title).toBe("React Debugging Notes");
   });
 
   it("uses a parameterized search term for both database queries", async () => {
     // Arrange
     query.mockResolvedValue({ rows: [] });
+    listContentDocuments.mockResolvedValue([]);
     listCurriculumReferences.mockResolvedValue([]);
 
     // Act
@@ -93,6 +110,7 @@ describe("searchLinksAndFaq", () => {
       links: [],
       faqEntries: [],
       curriculumReferences: [],
+      contentDocuments: [],
     });
     expect(query).not.toHaveBeenCalled();
   });
