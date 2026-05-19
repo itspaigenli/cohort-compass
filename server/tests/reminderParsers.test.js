@@ -58,6 +58,34 @@ describe("reminder parsers", () => {
       });
     });
 
+    it("accepts date-only values from the reminder form", () => {
+      // Arrange
+      const dueAt = "2026-04-30";
+
+      // Act
+      const result = parseDueAt(dueAt);
+
+      // Assert
+      expect(result).toEqual({
+        ok: true,
+        value: "2026-04-30T07:00:00.000Z",
+      });
+    });
+
+    it("accepts local date and time values from the reminder form", () => {
+      // Arrange
+      const dueAt = "2026-04-30T12:00";
+
+      // Act
+      const result = parseDueAt(dueAt);
+
+      // Assert
+      expect(result).toEqual({
+        ok: true,
+        value: "2026-04-30T19:00:00.000Z",
+      });
+    });
+
     it("rejects invalid due date values", () => {
       // Arrange
       // Invalid dates should not be saved.
@@ -65,8 +93,8 @@ describe("reminder parsers", () => {
       // Act
       const invalidDates = [
         "not a date",
-        "2026-04-30",
         "2026-02-31",
+        "2026-04-30T25:00",
         "2026-04-30T25:00:00.000Z",
         123,
       ].map((value) => parseDueAt(value));
