@@ -51,16 +51,38 @@ function renderFaqResult(entry) {
   );
 }
 
+function renderCurriculumResult(reference) {
+  return (
+    <article
+      key={reference.slug}
+      className="search-result-card search-result-card-clickable"
+      role="link"
+      tabIndex={0}
+      onClick={() => openResultUrl(reference.url)}
+      onKeyDown={(event) => handleResultKeyDown(event, reference.url)}
+    >
+      <p className="item-meta">{reference.relativePath}</p>
+      <h3>{reference.title}</h3>
+      <p>{reference.summary}</p>
+      <span className="search-result-link-label">Open curriculum reference</span>
+    </article>
+  );
+}
+
 export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedSearchTerm, setSubmittedSearchTerm] = useState("");
   const [results, setResults] = useState({
     links: [],
     faqEntries: [],
+    curriculumReferences: [],
   });
   const [status, setStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const totalResults = results.links.length + results.faqEntries.length;
+  const totalResults =
+    results.links.length +
+    results.faqEntries.length +
+    results.curriculumReferences.length;
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -69,7 +91,7 @@ export default function SearchPage() {
 
     if (!trimmedSearchTerm) {
       setSubmittedSearchTerm("");
-      setResults({ links: [], faqEntries: [] });
+      setResults({ links: [], faqEntries: [], curriculumReferences: [] });
       setStatus("idle");
       return;
     }
@@ -84,11 +106,12 @@ export default function SearchPage() {
       setResults({
         links: searchResults.links || [],
         faqEntries: searchResults.faqEntries || [],
+        curriculumReferences: searchResults.curriculumReferences || [],
       });
       setStatus("success");
     } catch (error) {
       setErrorMessage(error.message);
-      setResults({ links: [], faqEntries: [] });
+      setResults({ links: [], faqEntries: [], curriculumReferences: [] });
       setStatus("error");
     }
   }
@@ -119,6 +142,9 @@ export default function SearchPage() {
             <span className="status-pill">{totalResults} total matches</span>
             <span className="status-pill">{results.links.length} links</span>
             <span className="status-pill">{results.faqEntries.length} FAQ</span>
+            <span className="status-pill">
+              {results.curriculumReferences.length} curriculum
+            </span>
           </div>
           {status === "loading" ? <p>Loading search results...</p> : null}
           {status === "error" ? <p>{errorMessage}</p> : null}
@@ -130,6 +156,13 @@ export default function SearchPage() {
                 items={results.links}
                 emptyLabel="No links matched your search."
                 renderItem={renderLinkResult}
+              />
+              <SearchResultsSection
+                id="search-curriculum"
+                title="Techtonica Curriculum"
+                items={results.curriculumReferences}
+                emptyLabel="No curriculum references matched your search."
+                renderItem={renderCurriculumResult}
               />
               <SearchResultsSection
                 id="search-faq"
