@@ -1,20 +1,7 @@
 import { useState } from "react";
-import FaqPreview from "../components/dashboard/FaqPreview.jsx";
-import LinksPreview from "../components/dashboard/LinksPreview.jsx";
 import MonthlyCalendar from "../components/dashboard/MonthlyCalendar.jsx";
 import RemindersPanel from "../components/dashboard/RemindersPanel.jsx";
 import SchedulePreview from "../components/dashboard/SchedulePreview.jsx";
-
-function DashboardSection({ id, className, title, children }) {
-  const headingId = `${id}-heading`;
-
-  return (
-    <section id={id} className={className} aria-labelledby={headingId}>
-      <h2 id={headingId}>{title}</h2>
-      {children}
-    </section>
-  );
-}
 
 export default function DashboardPage() {
   const [scheduleItems, setScheduleItems] = useState([]);
@@ -34,7 +21,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="dashboard-page">
+    <div className="dashboard-page compass-home">
       <header className="hero dashboard-hero">
         <p className="eyebrow">Techtonica student hub</p>
         <h1>Cohort Compass</h1>
@@ -62,64 +49,34 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <nav className="section-nav" aria-label="Main sections">
-        <a href="#search">Search student hub</a>
-        <a href="#schedule">Schedule</a>
-        <a href="#links">Links</a>
-        <a href="#faq">FAQ</a>
-        <a href="#reminders">Reminders</a>
-      </nav>
-
-      <section className="quick-find" aria-labelledby="quick-find-heading">
-        <p className="eyebrow">Find what you need</p>
-        <h2 id="quick-find-heading">What are you looking for?</h2>
-        <div className="quick-find-links">
-          <a href="#search">Search all resources</a>
-          <a href="#schedule">Today&apos;s schedule</a>
-          <a href="#links">Program links</a>
-          <a href="#faq">Debugging help</a>
-          <a href="#reminders">My reminders</a>
+      <section className="compass-focus-band" aria-label="Today at a glance">
+        <div className="compass-focus-grid">
+          <SchedulePreview onScheduleItemsLoaded={setScheduleItems} />
+          <section
+            id="dashboard-reminders"
+            className="reminders-section"
+            aria-labelledby="dashboard-reminders-heading"
+          >
+            <h2 id="dashboard-reminders-heading">Reminder list</h2>
+            <RemindersPanel />
+          </section>
         </div>
       </section>
 
-      <div className="dashboard-grid">
-        <DashboardSection
-          id="schedule"
-          className="schedule-section dashboard-section-wide"
-          title="Upcoming Schedule"
-        >
-          <MonthlyCalendar
-            year={currentDate.getFullYear()}
-            monthIndex={currentDate.getMonth()}
-            scheduleItems={scheduleItems}
-          />
-          <SchedulePreview onScheduleItemsLoaded={setScheduleItems} />
-        </DashboardSection>
-
-        <DashboardSection
-          id="links"
-          className="links-section"
-          title="Important Links"
-        >
-          <LinksPreview />
-        </DashboardSection>
-
-        <DashboardSection
-          id="faq"
-          className="faq-section"
-          title="Debugging FAQ"
-        >
-          <FaqPreview />
-        </DashboardSection>
-
-        <DashboardSection
-          id="reminders"
-          className="reminders-section dashboard-section-wide"
-          title="Reminders"
-        >
-          <RemindersPanel />
-        </DashboardSection>
-      </div>
+      <section
+        id="schedule"
+        className="compass-calendar-band"
+        aria-labelledby="calendar-band-heading"
+      >
+        <div className="compass-calendar-band-header">
+          <h2 id="calendar-band-heading">Plan your week</h2>
+        </div>
+        <MonthlyCalendar
+          year={currentDate.getFullYear()}
+          monthIndex={currentDate.getMonth()}
+          scheduleItems={scheduleItems}
+        />
+      </section>
     </div>
   );
 }

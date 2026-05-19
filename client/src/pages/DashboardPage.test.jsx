@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { useEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
 import DashboardPage from "./DashboardPage.jsx";
@@ -25,68 +25,31 @@ vi.mock("../components/dashboard/MonthlyCalendar.jsx", () => ({
   ),
 }));
 
-vi.mock("../components/dashboard/LinksPreview.jsx", () => ({
-  default: () => <p>Links preview test content</p>,
-}));
-
-vi.mock("../components/dashboard/FaqPreview.jsx", () => ({
-  default: () => <p>FAQ preview test content</p>,
-}));
-
 vi.mock("../components/dashboard/RemindersPanel.jsx", () => ({
   default: () => <p>Reminders preview test content</p>,
 }));
 
 describe("DashboardPage", () => {
-  it("renders the homepage section navigation", () => {
-    // Arrange
-    render(<DashboardPage />);
-
-    const navigation = screen.getByRole("navigation", {
-      name: /main sections/i,
-    });
-
-    // Act
-    // No user action is needed because the navigation renders on page load.
-
-    // Assert
-    expect(
-      within(navigation).getByRole("link", { name: /schedule/i }),
-    ).toHaveAttribute("href", "#schedule");
-    expect(
-      within(navigation).getByRole("link", { name: /links/i }),
-    ).toHaveAttribute("href", "#links");
-    expect(
-      within(navigation).getByRole("link", { name: /faq/i }),
-    ).toHaveAttribute("href", "#faq");
-    expect(
-      within(navigation).getByRole("link", { name: /reminders/i }),
-    ).toHaveAttribute("href", "#reminders");
-  });
-
-  it("renders the dashboard section headings", () => {
+  it("renders the mock-final style dashboard sections", () => {
     // Arrange
     render(<DashboardPage />);
 
     // Act
-    // No user action is needed because the dashboard sections render on page load.
+    // No user action is needed because the dashboard renders on page load.
 
     // Assert
     expect(
-      screen.getByRole("heading", { name: /upcoming schedule/i }),
+      screen.getByRole("heading", { name: /cohort compass/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: /important links/i }),
+      screen.getByRole("heading", { name: /reminder list/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: /debugging faq/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: /^reminders$/i }),
+      screen.getByRole("heading", { name: /plan your week/i }),
     ).toBeInTheDocument();
   });
 
-  it("links to the search page from the homepage", () => {
+  it("renders the dashboard hero search form", () => {
     // Arrange
     render(<DashboardPage />);
 
@@ -95,8 +58,13 @@ describe("DashboardPage", () => {
 
     // Assert
     expect(
-      screen.getByRole("link", { name: /search student hub/i }),
-    ).toHaveAttribute("href", "#search");
+      screen.getByRole("searchbox", {
+        name: /search docs, tools, debugging help, or a topic/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /search student hub/i }),
+    ).toBeInTheDocument();
   });
 
   it("renders the monthly calendar on the dashboard", async () => {
