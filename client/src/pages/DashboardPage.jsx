@@ -18,20 +18,44 @@ function DashboardSection({ id, className, title, children }) {
 
 export default function DashboardPage() {
   const [scheduleItems, setScheduleItems] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const currentDate = new Date();
+
+  function handleHeroSearch(event) {
+    event.preventDefault();
+
+    const trimmedSearchQuery = searchQuery.trim();
+
+    if (trimmedSearchQuery) {
+      sessionStorage.setItem("cohort-compass-search-query", trimmedSearchQuery);
+    }
+
+    window.location.hash = "#search";
+  }
 
   return (
     <div className="dashboard-page">
       <header className="hero dashboard-hero">
-        <p className="eyebrow">Student dashboard</p>
+        <p className="eyebrow">Techtonica student hub</p>
         <h1>Cohort Compass</h1>
         <p>
-          Your Techtonica command center for schedules, links, reminders,
-          debugging help, curriculum references, and searchable cohort docs.
+          Search curriculum, documentation, debugging support, and program
+          resources in one place.
         </p>
+        <form className="hero-search-form" onSubmit={handleHeroSearch}>
+          <label className="sr-only" htmlFor="dashboard-search">
+            Search docs, tools, debugging help, or a topic
+          </label>
+          <input
+            id="dashboard-search"
+            type="search"
+            placeholder="Search docs, tools, debugging help, or a topic"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+          />
+          <button type="submit">Search student hub</button>
+        </form>
         <div className="hero-actions">
-          <a className="primary-action" href="#search">
-            Search all resources
-          </a>
           <a className="secondary-action" href="#faq">
             Open debugging FAQ
           </a>
@@ -65,8 +89,8 @@ export default function DashboardPage() {
           title="Upcoming Schedule"
         >
           <MonthlyCalendar
-            year={2026}
-            monthIndex={4}
+            year={currentDate.getFullYear()}
+            monthIndex={currentDate.getMonth()}
             scheduleItems={scheduleItems}
           />
           <SchedulePreview onScheduleItemsLoaded={setScheduleItems} />
