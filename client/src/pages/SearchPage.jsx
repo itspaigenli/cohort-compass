@@ -1,18 +1,17 @@
-import { useEffect, useState } from "react";
-import heroBackground from "../assets/techtonica-hero-perplexity-cat.png";
+import { useState } from "react";
 import SearchResultsSection from "../components/search/SearchResultsSection.jsx";
 import HeroSearchSection from "../components/shared/HeroSearchSection.jsx";
 import { getSuggestedVideos } from "../utils/videoSuggestions.js";
+import heroBackground from "../assets/techtonica-hero-perplexity-cat.png";
 
-const searchSections = [
-  { key: "videos", label: "Videos", id: "search-videos" },
-  { key: "links", label: "Links", id: "search-links" },
-  { key: "curriculumReferences", label: "Curriculum", id: "search-curriculum" },
-  { key: "contentDocuments", label: "Docs", id: "search-docs" },
-  { key: "faqEntries", label: "FAQ", id: "search-faq" },
-];
+const searchSectionTargets = {
+  links: "search-links",
+  faq: "search-faq",
+  curriculum: "search-curriculum",
+  docs: "search-docs",
+};
 
-function openResultUrl(url) {
+function openResultCard(url) {
   if (!url) {
     return;
   }
@@ -20,243 +19,295 @@ function openResultUrl(url) {
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
-function handleResultKeyDown(event, url) {
+function handleCardKeyDown(event, url) {
   if (event.key !== "Enter" && event.key !== " ") {
     return;
   }
 
   event.preventDefault();
-  openResultUrl(url);
+  openResultCard(url);
 }
 
-function renderLinkResult(link) {
+function scrollToSearchSection(sectionId) {
+  const section = document.getElementById(sectionId);
+
+  if (!section) {
+    return;
+  }
+
+  section.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderVideoItem(item) {
   return (
     <article
-      key={link.id}
-      className="search-result-card search-result-card-clickable"
+      key={item.id}
+      className="mini-card search-result-card search-result-card-clickable"
       role="link"
       tabIndex={0}
-      onClick={() => openResultUrl(link.url)}
-      onKeyDown={(event) => handleResultKeyDown(event, link.url)}
+      onClick={() => openResultCard(item.url)}
+      onKeyDown={(event) => handleCardKeyDown(event, item.url)}
     >
-      <p className="item-meta">{link.category}</p>
-      <h3>{link.title}</h3>
-      <p>{link.description}</p>
+      <p className="item-meta">{item.topic}</p>
+      <h3>{item.title}</h3>
+      <p>{item.description}</p>
+      <span className="search-result-link-label">Open YouTube results</span>
+    </article>
+  );
+}
+
+function renderLinkItem(item) {
+  return (
+    <article
+      key={item.id}
+      className="mini-card search-result-card search-result-card-clickable"
+      role="link"
+      tabIndex={0}
+      onClick={() => openResultCard(item.url)}
+      onKeyDown={(event) => handleCardKeyDown(event, item.url)}
+    >
+      <p className="item-meta">{item.category}</p>
+      <h3>{item.title}</h3>
+      <p>{item.description}</p>
       <span className="search-result-link-label">Open link</span>
     </article>
   );
 }
 
-function renderFaqResult(entry) {
+function renderCurriculumItem(item) {
   return (
-    <article key={entry.id} className="search-result-card">
-      <p className="item-meta">{entry.category}</p>
-      <h3>{entry.question}</h3>
-      <p>{entry.answer}</p>
-      {entry.error_topic ? (
-        <span className="tag-chip">{entry.error_topic}</span>
+    <article
+      key={item.slug}
+      className="mini-card search-result-card search-result-card-clickable"
+      role="link"
+      tabIndex={0}
+      onClick={() => openResultCard(item.url)}
+      onKeyDown={(event) => handleCardKeyDown(event, item.url)}
+    >
+      <p className="item-meta">{item.relativePath}</p>
+      <h3>{item.title}</h3>
+      <p>{item.summary}</p>
+      <span className="search-result-link-label">Open curriculum reference</span>
+    </article>
+  );
+}
+
+function renderContentDocumentItem(item) {
+  return (
+    <article
+      key={item.slug}
+      className="mini-card search-result-card search-result-card-clickable"
+      role="link"
+      tabIndex={0}
+      onClick={() => openResultCard(item.repoUrl)}
+      onKeyDown={(event) => handleCardKeyDown(event, item.repoUrl)}
+    >
+      <p className="item-meta">{item.relativePath}</p>
+      <h3>{item.title}</h3>
+      <p>{item.summary || item.excerpt}</p>
+      <div className="tag-row">
+        {(item.tags || []).slice(0, 4).map((tag) => (
+          <span key={tag} className="tag-chip">
+            {tag}
+          </span>
+        ))}
+      </div>
+      <span className="search-result-link-label">Open markdown source</span>
+      {item.sourceFileUrl ? (
+        <a
+          href={item.sourceFileUrl}
+          target="_blank"
+          rel="noreferrer"
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
+          Open original source file
+        </a>
+      ) : null}
+    </article>
+  );
+}
+
+function renderFaqItem(item) {
+  return (
+    <article key={item.id} className="mini-card search-result-card search-result-card-faq">
+      <p className="item-meta">{item.category}</p>
+      <h3>{item.question}</h3>
+      <p>{item.answer}</p>
+      {item.error_topic ? (
+        <div className="tag-row">
+          <span className="tag-chip search-faq-tag-chip">{item.error_topic}</span>
+        </div>
       ) : null}
       <a href="#faq">Browse full FAQ</a>
     </article>
   );
 }
 
-function renderCurriculumResult(reference) {
-  return (
-    <article
-      key={reference.slug}
-      className="search-result-card search-result-card-clickable"
-      role="link"
-      tabIndex={0}
-      onClick={() => openResultUrl(reference.url)}
-      onKeyDown={(event) => handleResultKeyDown(event, reference.url)}
-    >
-      <p className="item-meta">{reference.relativePath}</p>
-      <h3>{reference.title}</h3>
-      <p>{reference.summary}</p>
-      <span className="search-result-link-label">Open curriculum reference</span>
-    </article>
-  );
-}
-
-function renderVideoResult(video) {
-  return (
-    <article
-      key={video.id}
-      className="search-result-card search-result-card-clickable"
-      role="link"
-      tabIndex={0}
-      onClick={() => openResultUrl(video.url)}
-      onKeyDown={(event) => handleResultKeyDown(event, video.url)}
-    >
-      <p className="item-meta">{video.topic}</p>
-      <h3>{video.title}</h3>
-      <p>{video.description}</p>
-      <span className="search-result-link-label">Open YouTube results</span>
-    </article>
-  );
-}
-
-function renderContentDocumentResult(document) {
-  return (
-    <article
-      key={document.slug}
-      className="search-result-card search-result-card-clickable"
-      role="link"
-      tabIndex={0}
-      onClick={() => openResultUrl(document.repoUrl)}
-      onKeyDown={(event) => handleResultKeyDown(event, document.repoUrl)}
-    >
-      <p className="item-meta">{document.relativePath}</p>
-      <h3>{document.title}</h3>
-      <p>{document.summary || document.excerpt}</p>
-      <span className="search-result-link-label">Open markdown source</span>
-    </article>
-  );
-}
-
-export default function SearchPage({
-  query = "",
-  results = {
-    links: [],
-    faqEntries: [],
-    curriculumReferences: [],
-    contentDocuments: [],
-  },
-  onSearch,
-}) {
-  const [searchQuery, setSearchQuery] = useState(query);
-  const hasQuery = query.trim().length > 0;
-  const suggestedVideos = hasQuery ? getSuggestedVideos(query) : [];
+export default function SearchPage({ results, query, onSearch }) {
+  const currentQuery = query || "";
+  const [searchQuery, setSearchQuery] = useState(currentQuery);
+  const [sectionOpenSignals, setSectionOpenSignals] = useState({});
+  const hasQuery = currentQuery.trim().length > 0;
+  const suggestedVideos = getSuggestedVideos(currentQuery);
+  const visibleSuggestedVideos = hasQuery ? suggestedVideos : [];
+  const visibleLinks = hasQuery ? results.links : [];
+  const visibleFaqEntries = hasQuery ? results.faqEntries : [];
+  const visibleCurriculumReferences = hasQuery ? results.curriculumReferences : [];
+  const visibleContentDocuments = hasQuery ? results.contentDocuments : [];
   const totalResults =
-    suggestedVideos.length +
-    results.links.length +
-    results.faqEntries.length +
-    results.curriculumReferences.length +
-    results.contentDocuments.length;
+    visibleSuggestedVideos.length +
+    visibleLinks.length +
+    visibleFaqEntries.length +
+    visibleCurriculumReferences.length +
+    visibleContentDocuments.length;
 
-  useEffect(() => {
-    setSearchQuery(query);
-  }, [query]);
+  function handleSummaryJump(sectionKey) {
+    const nextSectionId = searchSectionTargets[sectionKey];
 
-  function handleSearch(nextQuery) {
-    const trimmedQuery = nextQuery.trim();
+    setSectionOpenSignals((current) => ({
+      ...current,
+      [sectionKey]: (current[sectionKey] || 0) + 1,
+    }));
 
-    if (!trimmedQuery) {
-      return;
-    }
-
-    onSearch?.(trimmedQuery);
-  }
-
-  function scrollToResultsSection(sectionId) {
-    const section = document.getElementById(sectionId);
-
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    window.requestAnimationFrame(() => {
+      scrollToSearchSection(nextSectionId);
+    });
   }
 
   return (
-    <div className="page-stack compass-home search-page">
+    <div className="page-stack compass-home search-page perplexity-inspired-home">
       <HeroSearchSection
         title="Search the Student Hub"
         query={searchQuery}
         onQueryChange={setSearchQuery}
-        onSearch={handleSearch}
+        onSearch={onSearch}
         backgroundSrc={heroBackground}
+        backHref="#dashboard"
         buttonLabel="Search"
-        secondaryActionLabel="Back to dashboard"
-        secondaryActionHref="#dashboard"
       />
 
-      <section
-        className="compass-calendar-band search-results-band"
-        aria-labelledby="search-results-heading"
-      >
-        <div className="panel-header">
-          <div>
-            <p className="item-meta">Search results</p>
-            <h2 id="search-results-heading">
-              {hasQuery ? `Results for ${query}` : "Results will appear here"}
-            </h2>
-          </div>
-          {hasQuery ? (
-            <span className="status-pill">{totalResults} total matches</span>
-          ) : null}
-        </div>
-
+      <section className="compass-calendar-band search-results-band">
         {hasQuery ? (
-          <>
-            <div className="search-results-summary" aria-label="Search summary">
-              {searchSections.map((section) => {
-                const sectionCount =
-                  section.key === "videos"
-                    ? suggestedVideos.length
-                    : results[section.key].length;
+          <div className="search-page-summary search-results-summary" aria-label="Search summary">
+            <span className="status-pill">{`Results for "${currentQuery}"`}</span>
+            <span className="status-pill">{totalResults} total matches</span>
+            <button
+              className="status-pill search-summary-link"
+              type="button"
+              onClick={() => handleSummaryJump("links")}
+            >
+              {results.links.length} links
+            </button>
+            <button
+              className="status-pill search-summary-link"
+              type="button"
+              onClick={() => handleSummaryJump("faq")}
+            >
+              {results.faqEntries.length} faq
+            </button>
+            <button
+              className="status-pill search-summary-link"
+              type="button"
+              onClick={() => handleSummaryJump("curriculum")}
+            >
+              {results.curriculumReferences.length} curriculum
+            </button>
+            <button
+              className="status-pill search-summary-link"
+              type="button"
+              onClick={() => handleSummaryJump("docs")}
+            >
+              {results.contentDocuments.length} docs
+            </button>
+          </div>
+        ) : null}
 
-                return (
-                  <button
-                    key={section.key}
-                    className="search-summary-link"
-                    type="button"
-                    onClick={() => scrollToResultsSection(section.id)}
-                  >
-                    {section.label}: {sectionCount}
-                  </button>
-                );
-              })}
+        <div className="search-grid">
+          <SearchResultsSection
+            id="search-videos"
+            title="Suggested Videos"
+            items={visibleSuggestedVideos}
+            emptyLabel="No curated video suggestions yet."
+            renderItem={renderVideoItem}
+          />
+
+          <SearchResultsSection
+            id={searchSectionTargets.links}
+            title="Links"
+            items={visibleLinks}
+            emptyLabel="No links yet."
+            renderItem={renderLinkItem}
+            openSignal={sectionOpenSignals.links}
+          />
+
+          <SearchResultsSection
+            id={searchSectionTargets.curriculum}
+            title="Techtonica Curriculum Repo"
+            items={visibleCurriculumReferences}
+            emptyLabel="No curriculum references yet."
+            renderItem={renderCurriculumItem}
+            openSignal={sectionOpenSignals.curriculum}
+          />
+
+          {hasQuery ? (
+            <div className="search-column-stack">
+              <SearchResultsSection
+                id={searchSectionTargets.docs}
+                title="Compass Content Docs"
+                items={visibleContentDocuments}
+                emptyLabel="No compass content docs yet."
+                renderItem={renderContentDocumentItem}
+                openSignal={sectionOpenSignals.docs}
+              />
+
+              <SearchResultsSection
+                id={searchSectionTargets.faq}
+                title="Debugging FAQ"
+                items={visibleFaqEntries}
+                emptyLabel="No FAQ matches yet."
+                className="search-results-panel-faq"
+                renderItem={renderFaqItem}
+                openSignal={sectionOpenSignals.faq}
+              />
             </div>
+          ) : (
+            <>
+              <SearchResultsSection
+                id={searchSectionTargets.docs}
+                title="Compass Content Docs"
+                items={visibleContentDocuments}
+                emptyLabel="No compass content docs yet."
+                renderItem={renderContentDocumentItem}
+                openSignal={sectionOpenSignals.docs}
+              />
 
-            <div className="search-grid">
               <SearchResultsSection
-                id="search-videos"
-                title="Suggested Videos"
-                items={suggestedVideos}
-                emptyLabel="No suggested videos matched your search."
-                renderItem={renderVideoResult}
+                id={searchSectionTargets.faq}
+                title="Debugging FAQ"
+                items={visibleFaqEntries}
+                emptyLabel="No FAQ matches yet."
+                className="search-results-panel-wide search-results-panel-faq"
+                renderItem={renderFaqItem}
+                openSignal={sectionOpenSignals.faq}
               />
-              <SearchResultsSection
-                id="search-links"
-                title="Links"
-                items={results.links}
-                emptyLabel="No links matched your search."
-                renderItem={renderLinkResult}
-              />
-              <SearchResultsSection
-                id="search-curriculum"
-                title="Techtonica Curriculum"
-                items={results.curriculumReferences}
-                emptyLabel="No curriculum references matched your search."
-                renderItem={renderCurriculumResult}
-              />
-              <div className="search-column-stack">
-                <SearchResultsSection
-                  id="search-docs"
-                  title="Compass Content Docs"
-                  items={results.contentDocuments}
-                  emptyLabel="No compass content docs matched your search."
-                  renderItem={renderContentDocumentResult}
-                />
-                <SearchResultsSection
-                  id="search-faq"
-                  title="Debugging FAQ"
-                  items={results.faqEntries}
-                  emptyLabel="No FAQ entries matched your search."
-                  renderItem={renderFaqResult}
-                />
-              </div>
-            </div>
-
-            {totalResults === 0 ? <p>No results found for {query}</p> : null}
-          </>
-        ) : (
-          <p className="empty-state">
-            Enter a topic above to search links, curriculum, docs, FAQ entries,
-            and suggested videos.
-          </p>
-        )}
+            </>
+          )}
+        </div>
       </section>
+
+      <button
+        className="search-back-to-top"
+        type="button"
+        aria-label="Back to top"
+        onClick={scrollToTop}
+      >
+        <i className="fa-solid fa-circle-arrow-up" aria-hidden="true" />
+      </button>
     </div>
   );
 }

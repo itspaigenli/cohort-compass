@@ -12,7 +12,7 @@ describe("dateTime utilities", () => {
         "2026-05-05T18:00:00.000Z",
         "America/Los_Angeles",
       ),
-    ).toBe("May 5, 10:00 AM - May 5, 11:00 AM");
+    ).toBe("May 5, 10:00 AM - 11:00 AM");
   });
 
   it("preserves date-only events as all-day local calendar dates", () => {

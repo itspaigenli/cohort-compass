@@ -5,17 +5,21 @@ import SchedulePreview from "../components/dashboard/SchedulePreview.jsx";
 import HeroSearchSection from "../components/shared/HeroSearchSection.jsx";
 import heroBackground from "../assets/techtonica-hero-perplexity-cat.png";
 
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 export default function DashboardPage({
   reminders = [],
   onRemindersChange,
-  scheduleItems = [],
+  scheduleItems,
+  onLoadScheduleItems,
   onSearch,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const currentDate = new Date();
 
   return (
-    <div className="page-stack dashboard-page compass-home perplexity-inspired-home">
+    <div className="page-stack compass-home perplexity-inspired-home">
       <HeroSearchSection
         title="Cohort Compass"
         query={searchQuery}
@@ -26,10 +30,11 @@ export default function DashboardPage({
         secondaryActionHref="#faq"
       />
 
-      <section className="compass-focus-band" aria-label="Today at a glance">
+      <section className="compass-focus-band">
         <div className="compass-focus-grid">
           <SchedulePreview
-            scheduleItems={scheduleItems}
+            items={scheduleItems}
+            onLoadItemsForDate={onLoadScheduleItems}
             className="compass-snapshot-surface"
           />
           <RemindersPanel
@@ -40,20 +45,32 @@ export default function DashboardPage({
         </div>
       </section>
 
-      <section
-        id="schedule"
-        className="compass-calendar-band"
-        aria-labelledby="calendar-band-heading"
-      >
+      <section className="compass-calendar-band">
         <div className="compass-calendar-band-header">
-          <h2 id="calendar-band-heading">Plan your week</h2>
+          <div>
+            <h2>Plan your week</h2>
+          </div>
         </div>
-        <MonthlyCalendar
-          scheduleItems={scheduleItems}
-          reminders={reminders}
-          today={currentDate}
-        />
+
+        <div className="compass-calendar-grid compass-calendar-grid-full">
+          <MonthlyCalendar
+            items={scheduleItems}
+            reminders={reminders}
+            onLoadItemsForDate={onLoadScheduleItems}
+            className="compass-calendar-surface"
+            remindersHref="#dashboard-reminders"
+          />
+        </div>
       </section>
+
+      <button
+        className="search-back-to-top"
+        type="button"
+        aria-label="Back to top"
+        onClick={scrollToTop}
+      >
+        <i className="fa-solid fa-circle-arrow-up" aria-hidden="true" />
+      </button>
     </div>
   );
 }

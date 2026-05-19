@@ -3,15 +3,15 @@ import { describe, expect, it, vi } from "vitest";
 import DashboardPage from "./DashboardPage.jsx";
 
 vi.mock("../components/dashboard/SchedulePreview.jsx", () => ({
-  default: ({ scheduleItems = [] }) => (
-    <p>Schedule preview received {scheduleItems.length} schedule item</p>
+  default: ({ items = [] }) => (
+    <p>Schedule preview received {items.length} schedule item</p>
   ),
 }));
 
 vi.mock("../components/dashboard/MonthlyCalendar.jsx", () => ({
-  default: ({ scheduleItems = [], reminders = [] }) => (
+  default: ({ items = [], reminders = [] }) => (
     <p>
-      Monthly calendar received {scheduleItems.length} schedule item and{" "}
+      Monthly calendar received {items.length} schedule item and{" "}
       {reminders.length} reminder
     </p>
   ),

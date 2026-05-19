@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import Layout from "./components/shared/Layout.jsx";
+import LoadingState from "./components/shared/LoadingState.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import FAQPage from "./pages/FAQPage.jsx";
 import SearchPage from "./pages/SearchPage.jsx";
-import Layout from "./components/shared/Layout.jsx";
 import { fetchContentDocuments } from "./services/contentApi.js";
 import { fetchCurriculumReferences } from "./services/curriculumApi.js";
 import { fetchFaqEntries } from "./services/faqApi.js";
@@ -10,40 +11,99 @@ import { fetchLinks } from "./services/linksApi.js";
 import { fetchReminders } from "./services/remindersApi.js";
 import { fetchScheduleItems } from "./services/scheduleApi.js";
 import { searchStudentHub } from "./services/searchApi.js";
+import {
+  buildLocalUnifiedSearchResults,
+  mergeUnifiedSearchResults,
+} from "./utils/unifiedSearchHelpers.js";
 
-const appPages = ["dashboard", "search", "faq"];
+const appPages = [
+  { id: "dashboard", label: "Dashboard" },
+  { id: "search", label: "Search" },
+  { id: "faq", label: "FAQ" },
+];
 
-function getPageFromHash() {
+function parseHashLocation() {
   const hash = window.location.hash.replace("#", "");
 
-  return appPages.includes(hash) ? hash : "dashboard";
+  if (!hash) {
+    return { page: "dashboard", anchor: "" };
+  }
+
+  const exactPage = appPages.find((item) => item.id === hash);
+
+  if (exactPage) {
+    return { page: exactPage.id, anchor: "" };
+  }
+
+  const anchoredPage = appPages.find((item) => hash.startsWith(`${item.id}-`));
+
+  if (anchoredPage) {
+    return { page: anchoredPage.id, anchor: hash };
+  }
+
+  return { page: "dashboard", anchor: "" };
+}
+
+function getInitialPage() {
+  return parseHashLocation().page;
 }
 
 function App() {
-  const [page, setPage] = useState(getPageFromHash);
+  const [page, setPage] = useState(getInitialPage);
   const [links, setLinks] = useState([]);
   const [faqEntries, setFaqEntries] = useState([]);
   const [reminders, setReminders] = useState([]);
   const [scheduleItems, setScheduleItems] = useState([]);
   const [contentDocuments, setContentDocuments] = useState([]);
   const [curriculumReferences, setCurriculumReferences] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [globalQuery, setGlobalQuery] = useState("");
   const [searchResults, setSearchResults] = useState({
+    query: "",
     links: [],
     faqEntries: [],
-    curriculumReferences: [],
     contentDocuments: [],
+    curriculumReferences: [],
   });
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     function handleHashChange() {
-      setPage(getPageFromHash());
+      const nextLocation = parseHashLocation();
+      setPage(nextLocation.page);
+
+      if (!nextLocation.anchor) {
+        window.scrollTo(0, 0);
+      }
     }
 
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
+    const { page: hashPage, anchor } = parseHashLocation();
+
+    if (!anchor || hashPage !== page) {
+      return;
+    }
+
+    const scrollToAnchor = () => {
+      const target = document.getElementById(anchor);
+
+      if (!target) {
+        return;
+      }
+
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    const frameId = window.requestAnimationFrame(scrollToAnchor);
+    return () => window.cancelAnimationFrame(frameId);
+  }, [loading, page]);
 
   useEffect(() => {
     async function loadAppData() {
@@ -69,70 +129,72 @@ function App() {
       setScheduleItems(nextScheduleItems);
       setContentDocuments(nextContentDocuments);
       setCurriculumReferences(nextCurriculumReferences);
-      setIsLoading(false);
+      setSearchResults(await searchStudentHub(""));
+      setLoading(false);
     }
 
     loadAppData();
   }, []);
 
-  async function handleSearch(query) {
-    const trimmedQuery = query.trim();
-
-    setSearchQuery(trimmedQuery);
-    setSearchResults(await searchStudentHub(trimmedQuery));
-    window.location.hash = "search";
+  function navigate(nextPage) {
+    window.location.hash = nextPage;
+    setPage(nextPage);
+    window.scrollTo(0, 0);
   }
 
-  const pageContent = useMemo(() => {
-    if (isLoading) {
-      return (
-        <div className="loading-state" role="status" aria-live="polite">
-          <div className="loading-dot" />
-          <p>Loading Cohort Compass...</p>
-        </div>
-      );
-    }
+  async function runUnifiedSearch(query) {
+    const localResults = buildLocalUnifiedSearchResults({
+      query,
+      links,
+      faqEntries,
+      contentDocuments,
+      curriculumReferences,
+    });
+    const nextResults = mergeUnifiedSearchResults(
+      await searchStudentHub(query),
+      localResults,
+    );
 
-    if (page === "search") {
-      return (
-        <SearchPage
-          query={searchQuery}
-          results={searchResults}
-          onSearch={handleSearch}
-        />
-      );
-    }
+    setSearchResults(nextResults);
+    return nextResults;
+  }
 
-    if (page === "faq") {
-      return <FAQPage faqEntries={faqEntries} />;
-    }
+  async function handleDashboardSearch(query) {
+    const trimmedQuery = query.trim();
 
-    return (
-      <DashboardPage
-        links={links}
-        faqEntries={faqEntries}
-        reminders={reminders}
-        onRemindersChange={setReminders}
-        scheduleItems={scheduleItems}
-        contentDocuments={contentDocuments}
-        curriculumReferences={curriculumReferences}
-        onSearch={handleSearch}
+    setGlobalQuery(trimmedQuery);
+    await runUnifiedSearch(trimmedQuery);
+    navigate("search");
+  }
+
+  let pageContent = (
+    <DashboardPage
+      links={links}
+      faqEntries={faqEntries}
+      reminders={reminders}
+      onRemindersChange={setReminders}
+      scheduleItems={scheduleItems}
+      onLoadScheduleItems={fetchScheduleItems}
+      contentDocuments={contentDocuments}
+      onSearch={handleDashboardSearch}
+    />
+  );
+
+  if (page === "search") {
+    pageContent = (
+      <SearchPage
+        query={globalQuery}
+        results={searchResults}
+        onSearch={handleDashboardSearch}
       />
     );
-  }, [
-    contentDocuments,
-    curriculumReferences,
-    faqEntries,
-    isLoading,
-    links,
-    page,
-    reminders,
-    scheduleItems,
-    searchQuery,
-    searchResults,
-  ]);
+  }
 
-  return <Layout>{pageContent}</Layout>;
+  if (page === "faq") {
+    pageContent = <FAQPage faqEntries={faqEntries} query={globalQuery} />;
+  }
+
+  return <Layout>{loading ? <LoadingState /> : pageContent}</Layout>;
 }
 
 export default App;

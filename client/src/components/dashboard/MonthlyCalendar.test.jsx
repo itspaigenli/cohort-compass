@@ -1,40 +1,42 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import MonthlyCalendar from "./MonthlyCalendar.jsx";
 
 describe("MonthlyCalendar", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-18T12:00:00-07:00"));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("renders an interactive monthly calendar", () => {
     // Arrange
-    render(<MonthlyCalendar today={new Date("2026-05-18T12:00:00-07:00")} />);
+    render(<MonthlyCalendar />);
 
     // Assert
-    expect(
-      screen.getByRole("heading", { name: /monthly schedule calendar/i }),
-    ).toBeInTheDocument();
     expect(screen.getByText(/may 2026/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "18" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
+    expect(screen.getByRole("button", { name: "18" })).toHaveClass("today");
   });
 
   it("moves between months", () => {
     // Arrange
-    render(<MonthlyCalendar today={new Date("2026-05-18T12:00:00-07:00")} />);
+    render(<MonthlyCalendar />);
 
     // Act
-    fireEvent.click(screen.getByRole("button", { name: "→" }));
+    fireEvent.click(screen.getByRole("button", { name: /next month/i }));
 
     // Assert
     expect(screen.getByText(/june 2026/i)).toBeInTheDocument();
   });
 
-  it("shows events and reminders in the selected day detail", () => {
+  it("shows events and reminders on matching calendar days", () => {
     // Arrange
     render(
       <MonthlyCalendar
-        today={new Date("2026-05-18T12:00:00-07:00")}
-        scheduleItems={[
+        items={[
           {
             id: 1,
             title: "Project Share",
@@ -55,18 +57,8 @@ describe("MonthlyCalendar", () => {
       />,
     );
 
-    // Act
-    fireEvent.click(screen.getByRole("button", { name: /19/i }));
-
-    const selectedDayDetail = screen.getByText(/tuesday, may 19/i)
-      .parentElement;
-
     // Assert
-    expect(
-      within(selectedDayDetail).getByText(/project share/i),
-    ).toBeInTheDocument();
-    expect(
-      within(selectedDayDetail).getByText(/submit weekly survey/i),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /1 event/i })).toBeInTheDocument();
+    expect(screen.getByText(/submit weekly survey/i)).toBeInTheDocument();
   });
 });

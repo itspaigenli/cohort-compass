@@ -1,39 +1,56 @@
 import { curatedVideoTopics } from "../data/videoResources.js";
+import { getQueryTerms } from "../../../shared/search/query.js";
 
 const topicAliases = {
   api: "api",
   apis: "api",
   backend: "api",
-  css: "css",
-  express: "api",
-  git: "git",
-  github: "git",
+  branch: "git",
+  branching: "git",
   html: "html",
+  css: "css",
   javascript: "javascript",
   js: "javascript",
-  node: "api",
-  postgres: "sql",
-  postgresql: "sql",
+  hook: "react",
+  hooks: "react",
   react: "react",
   reactjs: "react",
-  sql: "sql",
-  testing: "testing",
-  useeffect: "react",
+  state: "react",
   usestate: "react",
+  useeffect: "react",
+  git: "git",
+  github: "git",
+  "pull-request": "git",
+  pr: "git",
+  sql: "sql",
+  postgresql: "sql",
+  postgres: "sql",
+  express: "api",
+  node: "api",
+  testing: "testing",
   vitest: "testing",
+  rtl: "testing",
+  jest: "testing",
 };
 
-function getSearchTerms(query = "") {
-  return String(query)
-    .toLowerCase()
-    .split(/[^a-z0-9]+/)
-    .filter(Boolean);
-}
-
-export function getSuggestedVideos(query = "") {
-  const matchedTopics = [
-    ...new Set(getSearchTerms(query).map((term) => topicAliases[term]).filter(Boolean)),
+export function getSuggestedVideos(query = "", topic = "") {
+  const requested = [
+    ...getQueryTerms(query, { includeBigrams: true }),
+    ...getQueryTerms(topic, { includeBigrams: true }),
   ];
+  const matchedTopics = [...new Set(requested.map((term) => topicAliases[term]).filter(Boolean))];
 
-  return matchedTopics.flatMap((topic) => curatedVideoTopics[topic] || []);
+  if (!matchedTopics.length) {
+    return [];
+  }
+
+  return matchedTopics.flatMap((matchedTopic) =>
+    (curatedVideoTopics[matchedTopic] || []).map((video) => ({
+      ...video,
+      resource_type: "video",
+      tags: [matchedTopic, "youtube", "supplemental-learning"],
+      source_label: video.channel,
+      link_label: "Open YouTube results",
+    })),
+  );
 }

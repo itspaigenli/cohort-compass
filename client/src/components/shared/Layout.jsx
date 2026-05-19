@@ -4,8 +4,10 @@ export default function Layout({ children }) {
       <main className="content-shell">{children}</main>
       <footer className="site-footer">
         <div className="site-footer-inner">
-          <p>© Techtonica 2026</p>
-          <p>Designed by Paige Li</p>
+          <p className="site-footer-left">© Techtonica 2026</p>
+          <p className="site-footer-right">
+            Designed by <span className="site-footer-cat" aria-label="Cat art">ᓚᘏᗢ</span>Paige Li
+          </p>
         </div>
       </footer>
     </div>

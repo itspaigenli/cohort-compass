@@ -1,4 +1,4 @@
-import { format, parseISO } from "date-fns";
+import { addDays as addDateFnsDays, format, isSameDay, parseISO, startOfDay } from "date-fns";
 import { formatInTimeZone, toZonedTime } from "date-fns-tz";
 
 export const DEFAULT_TIME_ZONE =
@@ -17,6 +17,46 @@ export function parseCalendarDate(value) {
   return parseISO(value);
 }
 
+export function startOfLocalDay(date = new Date()) {
+  return startOfDay(date);
+}
+
+export function addDays(date, amount) {
+  return startOfDay(addDateFnsDays(date, amount));
+}
+
+export function toDateKey(date) {
+  return format(date, "yyyy-MM-dd");
+}
+
+export function toDateKeyInTimeZone(value, timeZone = DEFAULT_TIME_ZONE) {
+  if (isDateOnlyValue(value)) {
+    return value;
+  }
+
+  return formatInTimeZone(value, timeZone, "yyyy-MM-dd");
+}
+
+export function isSameCalendarDay(value, referenceDate = new Date(), timeZone = DEFAULT_TIME_ZONE) {
+  if (value instanceof Date) {
+    return isSameDay(value, referenceDate);
+  }
+
+  return toDateKeyInTimeZone(value, timeZone) === toDateKey(referenceDate);
+}
+
+export function formatDayLabel(date = new Date()) {
+  return format(date, "EEEE MMM d");
+}
+
+export function formatMonthYear(date = new Date()) {
+  return format(date, "MMMM yyyy");
+}
+
+export function formatMobileDetailDate(date = new Date()) {
+  return format(date, "EEEE, MMM d");
+}
+
 export function formatScheduleDateRange(startTime, endTime, timeZone = DEFAULT_TIME_ZONE) {
   if (isDateOnlyValue(startTime)) {
     return `${format(parseCalendarDate(startTime), "MMM d")} · All day`;
@@ -25,11 +65,40 @@ export function formatScheduleDateRange(startTime, endTime, timeZone = DEFAULT_T
   const start = formatInTimeZone(startTime, timeZone, "MMM d, h:mm a");
 
   if (!endTime) {
-    return `${start} - End time TBD`;
+    return start;
   }
 
-  const end = formatInTimeZone(endTime, timeZone, "MMM d, h:mm a");
+  const end = formatInTimeZone(endTime, timeZone, "h:mm a");
   return `${start} - ${end}`;
+}
+
+export function formatTimeRange(startTime, endTime, timeZone = DEFAULT_TIME_ZONE) {
+  if (isDateOnlyValue(startTime)) {
+    return "All day";
+  }
+
+  const start = formatInTimeZone(startTime, timeZone, "h:mm a");
+
+  if (!endTime) {
+    return start;
+  }
+
+  const end = formatInTimeZone(endTime, timeZone, "h:mm a");
+  return `${start} - ${end}`;
+}
+
+export function formatOptionalTime(value, timeZone = DEFAULT_TIME_ZONE) {
+  if (!value || isDateOnlyValue(value)) {
+    return "";
+  }
+
+  const parsedDate = parseCalendarDate(value);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "";
+  }
+
+  return formatInTimeZone(value, timeZone, "h:mm a");
 }
 
 export function normalizeScheduleItem(item, timeZone = DEFAULT_TIME_ZONE) {
@@ -46,10 +115,13 @@ export function normalizeScheduleItem(item, timeZone = DEFAULT_TIME_ZONE) {
     ...item,
     start_datetime: startDateTime,
     end_datetime: endDateTime,
+    start_date_key: toDateKeyInTimeZone(item.start_time, timeZone),
+    end_date_key: item.end_time ? toDateKeyInTimeZone(item.end_time, timeZone) : "",
     start_datetime_string: isDateOnlyValue(item.start_time)
       ? format(parseCalendarDate(item.start_time), "MMM d")
       : formatInTimeZone(item.start_time, timeZone, "MMM d, h:mm a"),
     date_and_duration_string: formatScheduleDateRange(item.start_time, item.end_time, timeZone),
+    time_range_string: formatTimeRange(item.start_time, item.end_time, timeZone),
     time_zone: timeZone,
   };
 }
