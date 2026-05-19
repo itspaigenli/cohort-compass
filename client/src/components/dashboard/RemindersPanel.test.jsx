@@ -1,10 +1,7 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import RemindersPanel from "./RemindersPanel.jsx";
-import {
-  createReminder,
-  fetchReminders,
-} from "../../services/remindersApi.js";
+import { createReminder } from "../../services/remindersApi.js";
 
 vi.mock("../../services/remindersApi.js", () => ({
   createReminder: vi.fn(),
@@ -18,9 +15,9 @@ describe("RemindersPanel", () => {
     vi.clearAllMocks();
   });
 
-  it("renders incomplete reminders before completed reminders", async () => {
+  it("renders incomplete reminders before completed reminders", () => {
     // Arrange
-    fetchReminders.mockResolvedValue([
+    const reminders = [
       {
         id: 1,
         text: "Review README links",
@@ -33,15 +30,13 @@ describe("RemindersPanel", () => {
         done: false,
         due_at: null,
       },
-    ]);
+    ];
 
     // Act
-    render(<RemindersPanel />);
+    render(<RemindersPanel reminders={reminders} />);
 
     // Assert
-    expect(screen.getByText(/loading reminders/i)).toBeInTheDocument();
-
-    const checkboxes = await screen.findAllByRole("checkbox");
+    const checkboxes = screen.getAllByRole("checkbox");
 
     expect(screen.getByText(/1 remaining · 1 completed/i)).toBeInTheDocument();
     expect(checkboxes[0]).toHaveAccessibleName(/submit milestone summary/i);
@@ -52,7 +47,7 @@ describe("RemindersPanel", () => {
 
   it("adds a new reminder from the form", async () => {
     // Arrange
-    fetchReminders.mockResolvedValue([]);
+    const handleRemindersChange = vi.fn();
     createReminder.mockResolvedValue({
       id: 3,
       text: "Update project notes",
@@ -61,9 +56,14 @@ describe("RemindersPanel", () => {
     });
 
     // Act
-    render(<RemindersPanel />);
+    render(
+      <RemindersPanel
+        reminders={[]}
+        onRemindersChange={handleRemindersChange}
+      />,
+    );
 
-    const reminderInput = await screen.findByLabelText(/add reminder/i);
+    const reminderInput = screen.getByLabelText(/add reminder/i);
     fireEvent.change(reminderInput, {
       target: { value: "Update project notes" },
     });
@@ -73,9 +73,16 @@ describe("RemindersPanel", () => {
     expect(createReminder).toHaveBeenCalledWith({
       text: "Update project notes",
     });
-    expect(
-      await screen.findByLabelText(/update project notes/i),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(handleRemindersChange).toHaveBeenCalledWith([
+        {
+          id: 3,
+          text: "Update project notes",
+          done: false,
+          due_at: null,
+        },
+      ]);
+    });
     expect(reminderInput).toHaveValue("");
   });
 });

@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   createReminder,
   deleteReminder,
-  fetchReminders,
   updateReminder,
 } from "../../services/remindersApi.js";
 
@@ -27,30 +26,12 @@ function formatDueDate(value) {
   });
 }
 
-export default function RemindersPanel() {
-  const [reminders, setReminders] = useState([]);
+export default function RemindersPanel({ reminders = [], onRemindersChange }) {
   const [draftText, setDraftText] = useState("");
-  const [status, setStatus] = useState("loading");
-  const [errorMessage, setErrorMessage] = useState("");
   const [actionError, setActionError] = useState("");
-  const completedCount = reminders.filter((reminder) => reminder.done).length;
-  const remainingCount = reminders.length - completedCount;
-
-  useEffect(() => {
-    async function loadReminders() {
-      try {
-        const items = await fetchReminders();
-
-        setReminders(sortReminders(items));
-        setStatus("success");
-      } catch (error) {
-        setErrorMessage(error.message);
-        setStatus("error");
-      }
-    }
-
-    loadReminders();
-  }, []);
+  const sortedReminders = sortReminders(reminders);
+  const completedCount = sortedReminders.filter((reminder) => reminder.done).length;
+  const remainingCount = sortedReminders.length - completedCount;
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -64,9 +45,7 @@ export default function RemindersPanel() {
     try {
       const reminder = await createReminder({ text });
 
-      setReminders((currentReminders) =>
-        sortReminders([reminder, ...currentReminders]),
-      );
+      onRemindersChange?.(sortReminders([reminder, ...reminders]));
       setDraftText("");
       setActionError("");
     } catch {
@@ -80,9 +59,9 @@ export default function RemindersPanel() {
         done: !reminder.done,
       });
 
-      setReminders((currentReminders) =>
+      onRemindersChange?.(
         sortReminders(
-          currentReminders.map((item) =>
+          reminders.map((item) =>
             item.id === updatedReminder.id ? updatedReminder : item,
           ),
         ),
@@ -97,21 +76,13 @@ export default function RemindersPanel() {
     try {
       await deleteReminder(id);
 
-      setReminders((currentReminders) =>
-        currentReminders.filter((reminder) => reminder.id !== id),
+      onRemindersChange?.(
+        reminders.filter((reminder) => reminder.id !== id),
       );
       setActionError("");
     } catch {
       setActionError("Unable to remove that reminder right now.");
     }
-  }
-
-  if (status === "loading") {
-    return <p>Loading reminders...</p>;
-  }
-
-  if (status === "error") {
-    return <p>{errorMessage}</p>;
   }
 
   return (
@@ -131,15 +102,15 @@ export default function RemindersPanel() {
       </form>
 
       {actionError ? <p>{actionError}</p> : null}
-      {!reminders.length ? <p>No reminders yet.</p> : null}
+      {!sortedReminders.length ? <p>No reminders yet.</p> : null}
 
-      {reminders.length ? (
+      {sortedReminders.length ? (
         <>
           <p>
             {remainingCount} remaining · {completedCount} completed
           </p>
           <ul>
-            {reminders.map((reminder) => {
+            {sortedReminders.map((reminder) => {
               const dueDate = formatDueDate(reminder.due_at);
 
               return (
