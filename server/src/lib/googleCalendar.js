@@ -64,7 +64,13 @@ export async function getGoogleCalendarScheduleItems() {
   url.searchParams.set("orderBy", "startTime");
   url.searchParams.set("timeZone", timeZone);
 
-  const response = await fetch(url);
+  let response;
+
+  try {
+    response = await fetch(url);
+  } catch {
+    return null;
+  }
 
   if (!response.ok) {
     return null;
