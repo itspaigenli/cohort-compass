@@ -1,22 +1,11 @@
 import { render, screen } from "@testing-library/react";
-import { useEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
 import DashboardPage from "./DashboardPage.jsx";
 
 vi.mock("../components/dashboard/SchedulePreview.jsx", () => ({
-  default: ({ onScheduleItemsLoaded }) => {
-    useEffect(() => {
-      onScheduleItemsLoaded?.([
-        {
-          id: 1,
-          title: "Project Share",
-          start_time: "2026-05-15T19:30:00.000Z",
-        },
-      ]);
-    }, [onScheduleItemsLoaded]);
-
-    return <p>Schedule preview test content</p>;
-  },
+  default: ({ scheduleItems = [] }) => (
+    <p>Schedule preview received {scheduleItems.length} schedule item</p>
+  ),
 }));
 
 vi.mock("../components/dashboard/MonthlyCalendar.jsx", () => ({
@@ -69,7 +58,17 @@ describe("DashboardPage", () => {
 
   it("renders the monthly calendar on the dashboard", async () => {
     // Arrange
-    render(<DashboardPage />);
+    render(
+      <DashboardPage
+        scheduleItems={[
+          {
+            id: 1,
+            title: "Project Share",
+            start_time: "2026-05-15T19:30:00.000Z",
+          },
+        ]}
+      />,
+    );
 
     // Act
     // No user action is needed because the calendar renders with the dashboard.

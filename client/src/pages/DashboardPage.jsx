@@ -3,8 +3,12 @@ import MonthlyCalendar from "../components/dashboard/MonthlyCalendar.jsx";
 import RemindersPanel from "../components/dashboard/RemindersPanel.jsx";
 import SchedulePreview from "../components/dashboard/SchedulePreview.jsx";
 
-export default function DashboardPage() {
-  const [scheduleItems, setScheduleItems] = useState([]);
+export default function DashboardPage({
+  reminders = [],
+  onRemindersChange,
+  scheduleItems = [],
+  onSearch,
+}) {
   const [searchQuery, setSearchQuery] = useState("");
   const currentDate = new Date();
 
@@ -13,11 +17,7 @@ export default function DashboardPage() {
 
     const trimmedSearchQuery = searchQuery.trim();
 
-    if (trimmedSearchQuery) {
-      sessionStorage.setItem("cohort-compass-search-query", trimmedSearchQuery);
-    }
-
-    window.location.hash = "#search";
+    onSearch?.(trimmedSearchQuery);
   }
 
   return (
@@ -51,14 +51,17 @@ export default function DashboardPage() {
 
       <section className="compass-focus-band" aria-label="Today at a glance">
         <div className="compass-focus-grid">
-          <SchedulePreview onScheduleItemsLoaded={setScheduleItems} />
+          <SchedulePreview scheduleItems={scheduleItems} />
           <section
             id="dashboard-reminders"
             className="reminders-section"
             aria-labelledby="dashboard-reminders-heading"
           >
             <h2 id="dashboard-reminders-heading">Reminder list</h2>
-            <RemindersPanel />
+            <RemindersPanel
+              reminders={reminders}
+              onRemindersChange={onRemindersChange}
+            />
           </section>
         </div>
       </section>
