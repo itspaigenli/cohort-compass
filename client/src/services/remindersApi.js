@@ -1,7 +1,7 @@
 import { getJson, requestJson } from "./api.js";
 
 export async function fetchReminders() {
-  const data = await getJson("/reminders");
+  const data = await getJson("/reminders", { reminders: [] });
 
   return data.reminders;
 }
