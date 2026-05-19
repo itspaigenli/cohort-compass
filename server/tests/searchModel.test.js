@@ -114,4 +114,32 @@ describe("searchLinksAndFaq", () => {
     });
     expect(query).not.toHaveBeenCalled();
   });
+
+  it("keeps database search results when optional source lists are unavailable", async () => {
+    // Arrange
+    query
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 1,
+            title: "React Documentation",
+            url: "https://react.dev/",
+            category: "technical docs",
+            description: "Official React documentation.",
+            tags: ["react"],
+          },
+        ],
+      })
+      .mockResolvedValueOnce({ rows: [] });
+    listContentDocuments.mockRejectedValue(new Error("content unavailable"));
+    listCurriculumReferences.mockRejectedValue(new Error("curriculum unavailable"));
+
+    // Act
+    const results = await searchLinksAndFaq("react");
+
+    // Assert
+    expect(results.links).toHaveLength(1);
+    expect(results.curriculumReferences).toEqual([]);
+    expect(results.contentDocuments).toEqual([]);
+  });
 });

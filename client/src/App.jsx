@@ -48,6 +48,14 @@ function getInitialPage() {
   return parseHashLocation().page;
 }
 
+async function loadOptionalAppData(loader) {
+  try {
+    return await loader();
+  } catch {
+    return [];
+  }
+}
+
 function App() {
   const [page, setPage] = useState(getInitialPage);
   const [links, setLinks] = useState([]);
@@ -115,12 +123,12 @@ function App() {
         nextContentDocuments,
         nextCurriculumReferences,
       ] = await Promise.all([
-        fetchLinks(),
-        fetchFaqEntries(),
-        fetchReminders(),
-        fetchScheduleItems(),
-        fetchContentDocuments(),
-        fetchCurriculumReferences(),
+        loadOptionalAppData(fetchLinks),
+        loadOptionalAppData(fetchFaqEntries),
+        loadOptionalAppData(fetchReminders),
+        loadOptionalAppData(fetchScheduleItems),
+        loadOptionalAppData(fetchContentDocuments),
+        loadOptionalAppData(fetchCurriculumReferences),
       ]);
 
       setLinks(nextLinks);

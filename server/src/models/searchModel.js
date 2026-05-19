@@ -31,6 +31,14 @@ function filterContentDocuments(documents, searchTerm) {
   );
 }
 
+async function loadOptionalList(loader) {
+  try {
+    return await loader();
+  } catch {
+    return [];
+  }
+}
+
 export async function searchLinksAndFaq(searchTerm) {
   const normalizedSearchTerm = searchTerm.trim().toLowerCase();
 
@@ -99,8 +107,8 @@ export async function searchLinksAndFaq(searchTerm) {
     ORDER BY faq_entries.category ASC, faq_entries.question ASC`,
     [searchPattern],
   );
-  const curriculumReferences = await listCurriculumReferences();
-  const contentDocuments = await listContentDocuments();
+  const curriculumReferences = await loadOptionalList(listCurriculumReferences);
+  const contentDocuments = await loadOptionalList(listContentDocuments);
 
   return {
     links: linksResult.rows,
