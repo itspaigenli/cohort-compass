@@ -2,8 +2,8 @@
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
-  color: #17313a;
-  background: #f6fbfc;
+  color: #f7fbfc;
+  background: #06151a;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -18,10 +18,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background:
-    linear-gradient(135deg, rgba(0, 147, 181, 0.12), transparent 32%),
-    linear-gradient(315deg, rgba(252, 118, 37, 0.1), transparent 26%),
-    #f6fbfc;
+  background: #06151a;
 }
 
 button,
@@ -35,14 +32,23 @@ select {
 }
 
 .app-shell {
-  width: min(1120px, calc(100vw - 2rem));
+  width: min(1120px, calc(100vw - 1rem));
   margin: 0 auto;
-  padding: 3rem 0;
+  padding: 1rem 0 2rem;
 }
 
 .dashboard-page {
   display: grid;
   gap: 1.25rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
 .hero {
@@ -52,14 +58,21 @@ select {
 }
 
 .dashboard-hero {
-  min-height: 22rem;
+  justify-items: center;
+  min-height: 36rem;
   align-content: center;
-  border-bottom: 1px solid rgba(0, 147, 181, 0.14);
+  margin-inline: calc(50% - 50vw);
+  padding: 5rem max(1rem, calc((100vw - 1120px) / 2)) 4rem;
+  border-bottom: 1px solid rgba(143, 221, 235, 0.16);
+  background:
+    linear-gradient(rgba(3, 13, 17, 0.5), rgba(3, 13, 17, 0.82)),
+    url("./assets/techtonica-hero-perplexity-cat.png") center / cover;
+  text-align: center;
 }
 
 .eyebrow {
   margin: 0;
-  color: #0a7e99;
+  color: #8fddeb;
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -69,17 +82,58 @@ select {
 .hero h1 {
   max-width: 760px;
   margin: 0;
-  color: #05556d;
-  font-size: clamp(2.7rem, 9vw, 5.8rem);
+  color: #ffffff;
+  font-size: clamp(2.8rem, 8vw, 4.6rem);
   line-height: 0.95;
 }
 
-.hero p:last-child {
+.hero > p {
   max-width: 620px;
   margin: 0;
-  color: rgba(23, 49, 58, 0.76);
+  color: rgba(255, 255, 255, 0.86);
   font-size: 1.12rem;
   line-height: 1.6;
+}
+
+.hero-search-form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  width: min(620px, 100%);
+  margin-top: 0.6rem;
+  padding: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 1.2rem;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(5px);
+}
+
+.hero-search-form input {
+  min-width: 16rem;
+  flex: 1;
+  border: 0;
+  border-radius: 0.9rem;
+  padding: 0.95rem 1rem;
+  color: #17313a;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.hero-search-form button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.9rem 1.2rem;
+  color: #ffffff;
+  background: #fc7625;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.hero-search-form input:focus,
+.hero-search-form button:focus {
+  outline: 3px solid rgba(143, 221, 235, 0.72);
+  outline-offset: 2px;
 }
 
 .hero-actions {
@@ -104,8 +158,8 @@ select {
 }
 
 .secondary-action {
-  color: #05556d;
-  background: rgba(255, 255, 255, 0.8);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .primary-action:hover,
@@ -124,11 +178,11 @@ select {
 }
 
 .section-nav a {
-  border: 1px solid rgba(0, 147, 181, 0.22);
+  border: 1px solid rgba(143, 221, 235, 0.22);
   border-radius: 8px;
   padding: 0.55rem 0.85rem;
-  color: #05556d;
-  background: rgba(255, 255, 255, 0.76);
+  color: #e9f8fb;
+  background: rgba(255, 255, 255, 0.08);
   font-weight: 700;
   text-decoration: none;
 }
@@ -136,7 +190,7 @@ select {
 .section-nav a:hover,
 .section-nav a:focus {
   border-color: rgba(252, 118, 37, 0.5);
-  color: #17313a;
+  color: #ffffff;
   outline: none;
 }
 
@@ -145,14 +199,14 @@ select {
   gap: 0.8rem;
   margin-top: 1.5rem;
   padding: 1.25rem;
-  border: 1px solid rgba(0, 147, 181, 0.18);
+  border: 1px solid rgba(143, 221, 235, 0.18);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .quick-find h2 {
   margin: 0;
-  color: #05556d;
+  color: #ffffff;
   font-size: clamp(1.45rem, 3vw, 2rem);
 }
 
@@ -163,12 +217,12 @@ select {
 }
 
 .quick-find-links a {
-  border: 1px solid rgba(0, 147, 181, 0.14);
+  border: 1px solid rgba(143, 221, 235, 0.14);
   border-left: 4px solid #fc7625;
   border-radius: 8px;
   padding: 0.85rem;
-  color: #17313a;
-  background: #ffffff;
+  color: #f7fbfc;
+  background: rgba(255, 255, 255, 0.08);
   font-weight: 700;
   line-height: 1.4;
   text-decoration: none;
@@ -177,7 +231,7 @@ select {
 .quick-find-links a:hover,
 .quick-find-links a:focus {
   border-color: rgba(252, 118, 37, 0.5);
-  color: #05556d;
+  color: #ffffff;
   outline: none;
 }
 
@@ -189,10 +243,10 @@ select {
   gap: 1rem;
   margin-top: 1.5rem;
   padding: 1.25rem;
-  border: 1px solid rgba(0, 147, 181, 0.18);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.84);
-  box-shadow: 0 18px 42px rgba(5, 85, 109, 0.09);
+  border: 1px solid rgba(143, 221, 235, 0.18);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.2);
 }
 
 .dashboard-grid {
@@ -217,7 +271,7 @@ select {
 .faq-section h2,
 .reminders-section h2 {
   margin: 0;
-  color: #05556d;
+  color: #ffffff;
   font-size: clamp(1.45rem, 3vw, 2rem);
 }
 
@@ -239,10 +293,10 @@ select {
   display: grid;
   gap: 0.35rem;
   padding: 1rem;
-  border: 1px solid rgba(0, 147, 181, 0.14);
+  border: 1px solid rgba(143, 221, 235, 0.14);
   border-left: 4px solid #fc7625;
   border-radius: 8px;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .schedule-section h3,
@@ -250,12 +304,12 @@ select {
 .faq-section h3,
 .reminders-section h3 {
   margin: 0;
-  color: #17313a;
+  color: #ffffff;
   font-size: 1.1rem;
 }
 
 .links-section a {
-  color: #05556d;
+  color: #8fddeb;
   text-decoration-color: rgba(252, 118, 37, 0.5);
 }
 
@@ -264,7 +318,7 @@ select {
 .faq-section p,
 .reminders-section p {
   margin: 0;
-  color: rgba(23, 49, 58, 0.72);
+  color: rgba(247, 251, 252, 0.76);
   line-height: 1.5;
 }
 
@@ -280,7 +334,7 @@ select {
 }
 
 .monthly-calendar-weekday {
-  color: #05556d;
+  color: #8fddeb;
   font-size: 0.8rem;
   font-weight: 700;
   text-align: center;
@@ -291,11 +345,11 @@ select {
   align-content: start;
   gap: 0.25rem;
   min-height: 4.5rem;
-  border: 1px solid rgba(0, 147, 181, 0.14);
+  border: 1px solid rgba(143, 221, 235, 0.14);
   border-radius: 8px;
   padding: 0.45rem;
-  background: #ffffff;
-  color: #17313a;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f7fbfc;
   font-size: 0.9rem;
 }
 
@@ -309,14 +363,14 @@ select {
 }
 
 .monthly-calendar-day-empty {
-  background: rgba(246, 251, 252, 0.8);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .monthly-calendar-event {
   border-radius: 6px;
   padding: 0.25rem;
-  color: #17313a;
-  background: rgba(252, 118, 37, 0.16);
+  color: #ffffff;
+  background: rgba(252, 118, 37, 0.38);
   font-size: 0.78rem;
   font-weight: 700;
   line-height: 1.25;
@@ -326,7 +380,7 @@ select {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  color: #17313a;
+  color: #f7fbfc;
   font-weight: 700;
 }
 
@@ -336,7 +390,7 @@ select {
 }
 
 .reminders-form label {
-  color: #17313a;
+  color: #f7fbfc;
   font-weight: 700;
 }
 
@@ -348,7 +402,7 @@ select {
 .reminders-form input {
   min-width: 0;
   flex: 1;
-  border: 1px solid rgba(0, 147, 181, 0.2);
+  border: 1px solid rgba(143, 221, 235, 0.2);
   border-radius: 8px;
   padding: 0.55rem 0.75rem;
   color: #17313a;
@@ -357,11 +411,11 @@ select {
 
 .reminders-section button {
   width: fit-content;
-  border: 1px solid rgba(0, 147, 181, 0.2);
+  border: 1px solid rgba(143, 221, 235, 0.2);
   border-radius: 8px;
   padding: 0.45rem 0.75rem;
-  color: #05556d;
-  background: #ffffff;
+  color: #ffffff;
+  background: #fc7625;
   cursor: pointer;
 }
 
