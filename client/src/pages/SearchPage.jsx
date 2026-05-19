@@ -97,6 +97,11 @@ export default function SearchPage() {
     <section className="search-page" aria-labelledby="search-page-heading">
       <p className="eyebrow">Student search</p>
       <h1 id="search-page-heading">Search the Student Hub</h1>
+      <p>
+        Search links and debugging FAQ entries from one place, then open the
+        result that matches what you need.
+      </p>
+      <a href="#dashboard">Back to dashboard</a>
       <form onSubmit={handleSubmit}>
         <label htmlFor="student-hub-search">Search the student hub</label>
         <input
