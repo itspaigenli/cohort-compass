@@ -1,20 +1,11 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import SchedulePreview from "./SchedulePreview.jsx";
-import { fetchScheduleItems } from "../../services/scheduleApi.js";
-
-vi.mock("../../services/scheduleApi.js", () => ({
-  fetchScheduleItems: vi.fn(),
-}));
 
 describe("SchedulePreview", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("renders the two-day schedule snapshot from the API", async () => {
+  it("renders the two-day schedule snapshot", () => {
     // Arrange
-    fetchScheduleItems.mockResolvedValue([
+    const scheduleItems = [
       {
         id: 1,
         title: "Career workshop",
@@ -25,19 +16,23 @@ describe("SchedulePreview", () => {
         meeting_url: "https://calendar.google.com/event",
         source: "google-calendar",
       },
-    ]);
+    ];
 
     // Act
-    render(<SchedulePreview today={new Date("2026-05-18T12:00:00-07:00")} />);
+    render(
+      <SchedulePreview
+        scheduleItems={scheduleItems}
+        today={new Date("2026-05-18T12:00:00-07:00")}
+      />,
+    );
 
     // Assert
-    expect(screen.getByText(/loading schedule/i)).toBeInTheDocument();
     expect(
-      await screen.findByRole("heading", { name: /two-day snapshot/i }),
+      screen.getByRole("heading", { name: /two-day snapshot/i }),
     ).toBeInTheDocument();
     expect(screen.getByText(/today · monday, may 18/i)).toBeInTheDocument();
     expect(screen.getByText(/tomorrow · tuesday, may 19/i)).toBeInTheDocument();
-    expect(await screen.findByText(/career workshop/i)).toBeInTheDocument();
+    expect(screen.getByText(/career workshop/i)).toBeInTheDocument();
     expect(
       screen.getByText(/showing events from google calendar/i),
     ).toBeInTheDocument();
@@ -48,31 +43,15 @@ describe("SchedulePreview", () => {
     ).toHaveAttribute("href", "https://calendar.google.com/event");
   });
 
-  it("renders empty day messages when no schedule items are returned", async () => {
-    // Arrange
-    fetchScheduleItems.mockResolvedValue([]);
-
+  it("renders empty day messages when no schedule items are provided", () => {
     // Act
     render(<SchedulePreview today={new Date("2026-05-18T12:00:00-07:00")} />);
 
     // Assert
-    const emptyMessages = await screen.findAllByText(
+    const emptyMessages = screen.getAllByText(
       /no events on this day's calendar/i,
     );
 
     expect(emptyMessages).toHaveLength(2);
-  });
-
-  it("renders an error message when the API request fails", async () => {
-    // Arrange
-    fetchScheduleItems.mockRejectedValue(new Error("Schedule request failed"));
-
-    // Act
-    render(<SchedulePreview />);
-
-    // Assert
-    await waitFor(() => {
-      expect(screen.getByText(/schedule request failed/i)).toBeInTheDocument();
-    });
   });
 });

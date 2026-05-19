@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { fetchScheduleItems } from "../../services/scheduleApi.js";
 import { parseCalendarDate } from "../../utils/dateTime.js";
 
 function addDays(date, dayCount) {
@@ -61,41 +59,13 @@ function ScheduleDay({ date, items, today }) {
   );
 }
 
-export default function SchedulePreview({ onScheduleItemsLoaded, today = new Date() }) {
-  const [scheduleItems, setScheduleItems] = useState([]);
-  const [status, setStatus] = useState("loading");
-  const [errorMessage, setErrorMessage] = useState("");
+export default function SchedulePreview({ scheduleItems = [], today = new Date() }) {
   const tomorrow = addDays(today, 1);
   const todayItems = getItemsForDay(scheduleItems, today);
   const tomorrowItems = getItemsForDay(scheduleItems, tomorrow);
   const hasGoogleCalendarItems = scheduleItems.some((item) => {
     return item.source === "google-calendar";
   });
-
-  useEffect(() => {
-    async function loadScheduleItems() {
-      try {
-        const items = await fetchScheduleItems();
-
-        setScheduleItems(items);
-        onScheduleItemsLoaded?.(items);
-        setStatus("success");
-      } catch (error) {
-        setErrorMessage(error.message);
-        setStatus("error");
-      }
-    }
-
-    loadScheduleItems();
-  }, [onScheduleItemsLoaded]);
-
-  if (status === "loading") {
-    return <p>Loading schedule...</p>;
-  }
-
-  if (status === "error") {
-    return <p>{errorMessage}</p>;
-  }
 
   return (
     <section className="schedule-section schedule-preview">
