@@ -7,9 +7,7 @@ Cohort Compass is a PERN student hub for Techtonica participants. It helps stude
 - Planning document: https://docs.google.com/document/d/1yWPORO5A6SUypcOhJe4VgpmYCTEtYpDQdpOa7JSdQIo/edit?usp=sharing
 - GitHub repository: https://github.com/itspaigenli/cohort-compass
 - GitHub Project board: https://github.com/users/itspaigenli/projects/1/views/1
-- Deployed frontend: https://cohortcompass.onrender.com
-- Deployed backend: https://cohort-compass-1.onrender.com
-- Backend API prefix: https://cohort-compass-1.onrender.com/api
+- Deployment target: Render web service
 
 ## MVP Features
 
@@ -97,7 +95,10 @@ cp server/.env-sample server/.env
 cp client/.env-sample client/.env
 ```
 
-The client expects the API URL:
+The client uses `/api` by default. During local frontend development, Vite
+proxies `/api` requests to the backend on port `3000`.
+
+The optional client API URL is:
 
 ```text
 VITE_API_URL=http://localhost:3000/api
@@ -162,31 +163,50 @@ Local URLs:
 
 ## Production Setup
 
-Cohort Compass uses separate frontend and backend services in production.
+Cohort Compass follows the Techtonica production-readiness setup where Express
+serves the built React app.
 
-Frontend production setup:
+Build the frontend:
 
-- Service: Render static site
-- Root directory: `client`
-- Build command: `npm install && npm run build`
-- Publish directory: `dist`
-- Production environment variable:
-
-```text
-VITE_API_URL=https://cohort-compass-1.onrender.com/api
+```bash
+cd client
+npm run build
 ```
 
-Backend production setup:
+Start the production server:
+
+```bash
+cd ../server
+npm start
+```
+
+The production server serves:
+
+- React app from `client/dist`
+- API routes from `/api`
+- Health check from `/api/health`
+
+Render production setup:
 
 - Service: Render web service
-- Root directory: `server`
-- Start command: `npm start`
+- Root directory: repository root
+- Build command:
+
+```text
+npm install --prefix server && npm install --prefix client && npm run build --prefix client
+```
+
+- Start command:
+
+```text
+npm start --prefix server
+```
+
 - Production environment variables:
 
 ```text
 DATABASE_URL=your-production-postgres-url
 PORT=provided-by-render
-CLIENT_ORIGIN=https://cohortcompass.onrender.com
 GOOGLE_CALENDAR_ID=
 GOOGLE_API_KEY=
 GOOGLE_CALENDAR_TIMEZONE=America/Los_Angeles
@@ -194,13 +214,8 @@ GOOGLE_CALENDAR_LOOKAHEAD_DAYS=30
 GOOGLE_CALENDAR_MAX_RESULTS=100
 ```
 
-Local development and production use different API URLs. Locally, the frontend
-points to `http://localhost:3000/api`. In production, the frontend points to the
-deployed backend API prefix.
-
-The Techtonica production-readiness guide also explains a single-server setup
-where Express serves the built React app. This project does not use that setup
-because the frontend and backend are deployed separately.
+Production does not need `VITE_API_URL` because the built frontend and API use
+the same deployed server.
 
 ## API Routes
 

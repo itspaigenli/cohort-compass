@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import { checkDatabaseConnection } from "./config/db.js";
 import contentRoutes from "./routes/contentRoutes.js";
 import curriculumRoutes from "./routes/curriculumRoutes.js";
@@ -11,6 +13,10 @@ import scheduleRoutes from "./routes/scheduleRoutes.js";
 import searchRoutes from "./routes/search.js";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const clientBuildPath = path.join(__dirname, "../../client/dist");
 
 const app = express();
 const allowedClientOrigins = [
@@ -43,7 +49,7 @@ app.use("/api/curriculum", curriculumRoutes);
 app.use("/api/content", contentRoutes);
 app.use("/api/search", searchRoutes);
 
-app.get("/", async (req, res) => {
+app.get("/api/health", async (req, res) => {
   const databaseConnected = await checkDatabaseConnection();
 
   res.json({
@@ -51,6 +57,12 @@ app.get("/", async (req, res) => {
     databaseConnected,
     mode: databaseConnected ? "database" : "database-unavailable",
   });
+});
+
+app.use(express.static(clientBuildPath));
+
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(clientBuildPath, "index.html"));
 });
 
 export default app;
