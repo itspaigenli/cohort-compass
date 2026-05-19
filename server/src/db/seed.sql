@@ -239,9 +239,22 @@ VALUES
   (10, 18);
 
 INSERT INTO faq_tags (faq_entry_id, tag_id)
-VALUES
-  (1, 20),
-  (1, 22),
-  (2, 21),
-  (2, 22),
-  (10, 23);
+SELECT faq_entries.id, tags.id
+FROM faq_entries
+JOIN tags
+  ON tags.name IN ('useEffect', 'debugging')
+WHERE faq_entries.error_topic = 'useEffect';
+
+INSERT INTO faq_tags (faq_entry_id, tag_id)
+SELECT faq_entries.id, tags.id
+FROM faq_entries
+JOIN tags
+  ON tags.name IN ('merge conflict', 'debugging')
+WHERE faq_entries.error_topic = 'merge conflict';
+
+INSERT INTO faq_tags (faq_entry_id, tag_id)
+SELECT faq_entries.id, tags.id
+FROM faq_entries
+JOIN tags
+  ON tags.name = 'deployment'
+WHERE faq_entries.error_topic = 'deployment error';

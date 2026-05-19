@@ -1,3 +1,11 @@
+DROP TABLE IF EXISTS faq_tags;
+DROP TABLE IF EXISTS important_link_tags;
+DROP TABLE IF EXISTS tags;
+DROP TABLE IF EXISTS reminders;
+DROP TABLE IF EXISTS schedule_items;
+DROP TABLE IF EXISTS faq_entries;
+DROP TABLE IF EXISTS important_links;
+
 CREATE TABLE important_links (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
