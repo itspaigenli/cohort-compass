@@ -91,7 +91,15 @@ The server expects:
 DATABASE_URL=postgresql://yourusername@localhost:5432/cohort-compass-db
 PORT=3000
 CLIENT_ORIGIN=http://localhost:5173
+GOOGLE_CALENDAR_ID=
+GOOGLE_API_KEY=
+GOOGLE_CALENDAR_TIMEZONE=America/Los_Angeles
+GOOGLE_CALENDAR_LOOKAHEAD_DAYS=30
+GOOGLE_CALENDAR_MAX_RESULTS=100
 ```
+
+Google Calendar values are optional for local development. If they are not set,
+the schedule uses the PostgreSQL `schedule_items` fallback data.
 
 Create and seed the local PostgreSQL database using the SQL files in `server/src/db/`:
 
