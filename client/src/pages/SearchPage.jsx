@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchResultsSection from "../components/search/SearchResultsSection.jsx";
 import { searchStudentHub } from "../services/searchApi.js";
 import { getSuggestedVideos } from "../utils/videoSuggestions.js";
@@ -107,7 +107,9 @@ function renderContentDocumentResult(document) {
 }
 
 export default function SearchPage() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(() => {
+    return sessionStorage.getItem("cohort-compass-search-query") || "";
+  });
   const [submittedSearchTerm, setSubmittedSearchTerm] = useState("");
   const [results, setResults] = useState({
     links: [],
@@ -125,11 +127,7 @@ export default function SearchPage() {
     results.curriculumReferences.length +
     results.contentDocuments.length;
 
-  async function handleSubmit(event) {
-    event.preventDefault();
-
-    const trimmedSearchTerm = searchTerm.trim();
-
+  async function runSearch(trimmedSearchTerm) {
     if (!trimmedSearchTerm) {
       setSubmittedSearchTerm("");
       setResults({
@@ -167,6 +165,24 @@ export default function SearchPage() {
       setStatus("error");
     }
   }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    await runSearch(searchTerm.trim());
+  }
+
+  useEffect(() => {
+    const savedSearchQuery = sessionStorage.getItem(
+      "cohort-compass-search-query",
+    );
+
+    if (!savedSearchQuery) {
+      return;
+    }
+
+    sessionStorage.removeItem("cohort-compass-search-query");
+    runSearch(savedSearchQuery.trim());
+  }, []);
 
   return (
     <section className="search-page" aria-labelledby="search-page-heading">
