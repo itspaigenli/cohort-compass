@@ -1,5 +1,18 @@
 const GOOGLE_CALENDAR_API_BASE = "https://www.googleapis.com/calendar/v3/calendars";
 
+function getLookaheadEndTime() {
+  const lookaheadDays = Number(process.env.GOOGLE_CALENDAR_LOOKAHEAD_DAYS || "30");
+  const endTime = new Date();
+
+  endTime.setDate(endTime.getDate() + lookaheadDays);
+
+  return endTime.toISOString();
+}
+
+function getMaxResults() {
+  return process.env.GOOGLE_CALENDAR_MAX_RESULTS || "100";
+}
+
 function getCalendarConfig() {
   return {
     calendarId: process.env.GOOGLE_CALENDAR_ID,
@@ -36,6 +49,9 @@ export async function getGoogleCalendarScheduleItems() {
   );
 
   url.searchParams.set("key", apiKey);
+  url.searchParams.set("timeMin", new Date().toISOString());
+  url.searchParams.set("timeMax", getLookaheadEndTime());
+  url.searchParams.set("maxResults", getMaxResults());
   url.searchParams.set("singleEvents", "true");
   url.searchParams.set("orderBy", "startTime");
 
