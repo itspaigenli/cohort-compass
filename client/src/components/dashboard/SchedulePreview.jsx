@@ -1,4 +1,5 @@
-import { parseCalendarDate } from "../../utils/dateTime.js";
+import { useState } from "react";
+import { formatScheduleDateRange, parseCalendarDate } from "../../utils/dateTime.js";
 
 function addDays(date, dayCount) {
   const nextDate = new Date(date);
@@ -33,17 +34,36 @@ function getItemsForDay(items, date) {
   });
 }
 
+function getLocationLabel(location = "") {
+  if (!location) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(location)) {
+    return location.includes("zoom.us") ? "Zoom" : "Virtual meeting";
+  }
+
+  return location;
+}
+
 function ScheduleDay({ date, items, today }) {
   return (
     <section className="schedule-day">
-      <h3>{getDayHeading(date, today)}</h3>
+      <div className="schedule-day-header">
+        <h3>{getDayHeading(date, today)}</h3>
+      </div>
       {items.length ? (
         <ul className="schedule-list">
           {items.map((item) => (
-            <li key={item.id} className="schedule-card">
-              <p className="item-meta">{item.date_and_duration_string}</p>
-              <h4>{item.title}</h4>
-              {item.location ? <p>{item.location}</p> : null}
+            <li key={item.id} className="mini-card schedule-card">
+              <p className="item-meta">
+                {item.date_and_duration_string ||
+                  formatScheduleDateRange(item.start_time, item.end_time)}
+              </p>
+              <h3>{item.title}</h3>
+              {item.location ? (
+                <p className="item-meta">{getLocationLabel(item.location)}</p>
+              ) : null}
               {item.meeting_url ? (
                 <a href={item.meeting_url} target="_blank" rel="noreferrer">
                   View in Google Calendar
@@ -59,27 +79,46 @@ function ScheduleDay({ date, items, today }) {
   );
 }
 
-export default function SchedulePreview({ scheduleItems = [], today = new Date() }) {
-  const tomorrow = addDays(today, 1);
-  const todayItems = getItemsForDay(scheduleItems, today);
-  const tomorrowItems = getItemsForDay(scheduleItems, tomorrow);
-  const hasGoogleCalendarItems = scheduleItems.some((item) => {
-    return item.source === "google-calendar";
-  });
+export default function SchedulePreview({
+  scheduleItems = [],
+  today = new Date(),
+  className = "",
+}) {
+  const [anchorDay, setAnchorDay] = useState(today);
+  const nextDay = addDays(anchorDay, 1);
+  const anchorItems = getItemsForDay(scheduleItems, anchorDay);
+  const nextDayItems = getItemsForDay(scheduleItems, nextDay);
+
+  function moveAnchorDay(dayCount) {
+    setAnchorDay((currentDate) => addDays(currentDate, dayCount));
+  }
 
   return (
-    <section className="schedule-section schedule-preview">
+    <section className={`schedule-section schedule-preview ${className}`.trim()}>
       <div className="panel-header">
         <h2>Two-day snapshot</h2>
-        <p className="schedule-source-note">
-          {hasGoogleCalendarItems
-            ? "Showing events from Google Calendar."
-            : "Showing saved schedule items."}
-        </p>
+        <div className="schedule-nav">
+          <button
+            type="button"
+            className="icon-button"
+            aria-label="Previous days"
+            onClick={() => moveAnchorDay(-2)}
+          >
+            ←
+          </button>
+          <button
+            type="button"
+            className="icon-button"
+            aria-label="Next days"
+            onClick={() => moveAnchorDay(2)}
+          >
+            →
+          </button>
+        </div>
       </div>
       <div className="schedule-columns">
-        <ScheduleDay date={today} items={todayItems} today={today} />
-        <ScheduleDay date={tomorrow} items={tomorrowItems} today={today} />
+        <ScheduleDay date={anchorDay} items={anchorItems} today={today} />
+        <ScheduleDay date={nextDay} items={nextDayItems} today={today} />
       </div>
     </section>
   );

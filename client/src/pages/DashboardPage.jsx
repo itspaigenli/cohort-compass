@@ -28,7 +28,10 @@ export default function DashboardPage({
 
       <section className="compass-focus-band" aria-label="Today at a glance">
         <div className="compass-focus-grid">
-          <SchedulePreview scheduleItems={scheduleItems} />
+          <SchedulePreview
+            scheduleItems={scheduleItems}
+            className="compass-snapshot-surface"
+          />
           <RemindersPanel
             reminders={reminders}
             onRemindersChange={onRemindersChange}
