@@ -1,10 +1,7 @@
 import { getJson } from "./api.js";
-import { mockCurriculumReferences } from "../data/mockData.js";
 
 export async function fetchCurriculumReferences() {
-  const data = await getJson("/curriculum", {
-    curriculumReferences: mockCurriculumReferences,
-  });
+  const data = await getJson("/curriculum");
 
   return data.curriculumReferences || [];
 }

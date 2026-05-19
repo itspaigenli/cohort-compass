@@ -1,10 +1,7 @@
 import { getJson } from "./api.js";
-import { mockContentDocuments } from "../data/mockData.js";
 
 export async function fetchContentDocuments() {
-  const data = await getJson("/content", {
-    contentDocuments: mockContentDocuments,
-  });
+  const data = await getJson("/content");
 
   return data.contentDocuments || [];
 }
