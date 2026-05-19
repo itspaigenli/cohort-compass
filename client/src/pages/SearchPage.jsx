@@ -88,6 +88,24 @@ function renderVideoResult(video) {
   );
 }
 
+function renderContentDocumentResult(document) {
+  return (
+    <article
+      key={document.slug}
+      className="search-result-card search-result-card-clickable"
+      role="link"
+      tabIndex={0}
+      onClick={() => openResultUrl(document.repoUrl)}
+      onKeyDown={(event) => handleResultKeyDown(event, document.repoUrl)}
+    >
+      <p className="item-meta">{document.relativePath}</p>
+      <h3>{document.title}</h3>
+      <p>{document.summary || document.excerpt}</p>
+      <span className="search-result-link-label">Open markdown source</span>
+    </article>
+  );
+}
+
 export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedSearchTerm, setSubmittedSearchTerm] = useState("");
@@ -95,6 +113,7 @@ export default function SearchPage() {
     links: [],
     faqEntries: [],
     curriculumReferences: [],
+    contentDocuments: [],
   });
   const [status, setStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -103,7 +122,8 @@ export default function SearchPage() {
     suggestedVideos.length +
     results.links.length +
     results.faqEntries.length +
-    results.curriculumReferences.length;
+    results.curriculumReferences.length +
+    results.contentDocuments.length;
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -112,7 +132,12 @@ export default function SearchPage() {
 
     if (!trimmedSearchTerm) {
       setSubmittedSearchTerm("");
-      setResults({ links: [], faqEntries: [], curriculumReferences: [] });
+      setResults({
+        links: [],
+        faqEntries: [],
+        curriculumReferences: [],
+        contentDocuments: [],
+      });
       setStatus("idle");
       return;
     }
@@ -128,11 +153,17 @@ export default function SearchPage() {
         links: searchResults.links || [],
         faqEntries: searchResults.faqEntries || [],
         curriculumReferences: searchResults.curriculumReferences || [],
+        contentDocuments: searchResults.contentDocuments || [],
       });
       setStatus("success");
     } catch (error) {
       setErrorMessage(error.message);
-      setResults({ links: [], faqEntries: [], curriculumReferences: [] });
+      setResults({
+        links: [],
+        faqEntries: [],
+        curriculumReferences: [],
+        contentDocuments: [],
+      });
       setStatus("error");
     }
   }
@@ -166,6 +197,9 @@ export default function SearchPage() {
             <span className="status-pill">
               {results.curriculumReferences.length} curriculum
             </span>
+            <span className="status-pill">
+              {results.contentDocuments.length} docs
+            </span>
             <span className="status-pill">{suggestedVideos.length} videos</span>
           </div>
           {status === "loading" ? <p>Loading search results...</p> : null}
@@ -192,6 +226,13 @@ export default function SearchPage() {
                 items={results.curriculumReferences}
                 emptyLabel="No curriculum references matched your search."
                 renderItem={renderCurriculumResult}
+              />
+              <SearchResultsSection
+                id="search-docs"
+                title="Compass Content Docs"
+                items={results.contentDocuments}
+                emptyLabel="No compass content docs matched your search."
+                renderItem={renderContentDocumentResult}
               />
               <SearchResultsSection
                 id="search-faq"
