@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import FAQPage from "./pages/FAQPage.jsx";
 import SearchPage from "./pages/SearchPage.jsx";
+import Layout from "./components/shared/Layout.jsx";
 import { fetchContentDocuments } from "./services/contentApi.js";
 import { fetchCurriculumReferences } from "./services/curriculumApi.js";
 import { fetchFaqEntries } from "./services/faqApi.js";
@@ -131,11 +132,7 @@ function App() {
     searchResults,
   ]);
 
-  return (
-    <main className="app-shell">
-      {pageContent}
-    </main>
-  );
+  return <Layout>{pageContent}</Layout>;
 }
 
 export default App;
