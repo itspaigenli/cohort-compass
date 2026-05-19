@@ -5,6 +5,9 @@ export default function SchedulePreview({ onScheduleItemsLoaded }) {
   const [scheduleItems, setScheduleItems] = useState([]);
   const [status, setStatus] = useState("loading");
   const [errorMessage, setErrorMessage] = useState("");
+  const hasGoogleCalendarItems = scheduleItems.some((item) => {
+    return item.source === "google-calendar";
+  });
 
   useEffect(() => {
     async function loadScheduleItems() {
@@ -36,21 +39,28 @@ export default function SchedulePreview({ onScheduleItemsLoaded }) {
   }
 
   return (
-    <ul>
-      {scheduleItems.map((item) => (
-        <li key={item.id}>
-          <h3>{item.title}</h3>
-          <p>{item.description}</p>
-          <p>
-            <strong>When:</strong> {item.date_and_duration_string}
-          </p>
-          {item.location ? (
+    <div className="schedule-preview">
+      <p className="schedule-source-note">
+        {hasGoogleCalendarItems
+          ? "Showing events from Google Calendar."
+          : "Showing saved schedule items."}
+      </p>
+      <ul>
+        {scheduleItems.map((item) => (
+          <li key={item.id}>
+            <h3>{item.title}</h3>
+            <p>{item.description}</p>
             <p>
-              <strong>Where:</strong> {item.location}
+              <strong>When:</strong> {item.date_and_duration_string}
             </p>
-          ) : null}
-        </li>
-      ))}
-    </ul>
+            {item.location ? (
+              <p>
+                <strong>Where:</strong> {item.location}
+              </p>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
