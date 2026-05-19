@@ -1,6 +1,7 @@
 const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function MonthlyCalendar({ year, monthIndex, scheduleItems = [] }) {
+  const today = new Date();
   const monthName = new Date(year, monthIndex).toLocaleString("en-US", {
     month: "long",
   });
@@ -19,6 +20,14 @@ export default function MonthlyCalendar({ year, monthIndex, scheduleItems = [] }
         itemDate.getDate() === day
       );
     });
+  }
+
+  function isToday(day) {
+    return (
+      today.getFullYear() === year &&
+      today.getMonth() === monthIndex &&
+      today.getDate() === day
+    );
   }
 
   return (
@@ -41,10 +50,18 @@ export default function MonthlyCalendar({ year, monthIndex, scheduleItems = [] }
         ))}
         {monthDays.map((day) => {
           const dayScheduleItems = getScheduleItemsForDay(day);
+          const hasEvents = dayScheduleItems.length > 0;
+          const dayLabel = `${monthName} ${day}, ${year}${
+            hasEvents ? `, ${dayScheduleItems.length} schedule item` : ""
+          }${isToday(day) ? ", today" : ""}`;
 
           return (
-            <span key={day} className="monthly-calendar-day">
-              <span>{day}</span>
+            <span
+              key={day}
+              className={`monthly-calendar-day${isToday(day) ? " monthly-calendar-day-today" : ""}`}
+              aria-label={dayLabel}
+            >
+              <span className="monthly-calendar-day-number">{day}</span>
               {dayScheduleItems.map((item) => (
                 <span key={item.id} className="monthly-calendar-event">
                   {item.title}
