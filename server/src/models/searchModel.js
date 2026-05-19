@@ -1,4 +1,20 @@
 import { query } from "../config/db.js";
+import { listCurriculumReferences } from "./curriculumModel.js";
+
+function matchesSearchTerm(value, searchTerm) {
+  return String(value || "").toLowerCase().includes(searchTerm);
+}
+
+function filterCurriculumReferences(references, searchTerm) {
+  return references.filter((reference) =>
+    [
+      reference.title,
+      reference.relativePath,
+      reference.summary,
+      reference.kind,
+    ].some((value) => matchesSearchTerm(value, searchTerm)),
+  );
+}
 
 export async function searchLinksAndFaq(searchTerm) {
   const normalizedSearchTerm = searchTerm.trim().toLowerCase();
@@ -7,6 +23,7 @@ export async function searchLinksAndFaq(searchTerm) {
     return {
       links: [],
       faqEntries: [],
+      curriculumReferences: [],
     };
   }
 
@@ -66,9 +83,14 @@ export async function searchLinksAndFaq(searchTerm) {
     ORDER BY faq_entries.category ASC, faq_entries.question ASC`,
     [searchPattern],
   );
+  const curriculumReferences = await listCurriculumReferences();
 
   return {
     links: linksResult.rows,
     faqEntries: faqResult.rows,
+    curriculumReferences: filterCurriculumReferences(
+      curriculumReferences,
+      normalizedSearchTerm,
+    ),
   };
 }
