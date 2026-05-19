@@ -2,6 +2,8 @@ import { useState } from "react";
 import MonthlyCalendar from "../components/dashboard/MonthlyCalendar.jsx";
 import RemindersPanel from "../components/dashboard/RemindersPanel.jsx";
 import SchedulePreview from "../components/dashboard/SchedulePreview.jsx";
+import HeroSearchSection from "../components/shared/HeroSearchSection.jsx";
+import heroBackground from "../assets/techtonica-hero-perplexity-cat.png";
 
 export default function DashboardPage({
   reminders = [],
@@ -12,42 +14,17 @@ export default function DashboardPage({
   const [searchQuery, setSearchQuery] = useState("");
   const currentDate = new Date();
 
-  function handleHeroSearch(event) {
-    event.preventDefault();
-
-    const trimmedSearchQuery = searchQuery.trim();
-
-    onSearch?.(trimmedSearchQuery);
-  }
-
   return (
     <div className="dashboard-page compass-home">
-      <header className="hero dashboard-hero">
-        <p className="eyebrow">Techtonica student hub</p>
-        <h1>Cohort Compass</h1>
-        <p>
-          Search curriculum, documentation, debugging support, and program
-          resources in one place.
-        </p>
-        <form className="hero-search-form" onSubmit={handleHeroSearch}>
-          <label className="sr-only" htmlFor="dashboard-search">
-            Search docs, tools, debugging help, or a topic
-          </label>
-          <input
-            id="dashboard-search"
-            type="search"
-            placeholder="Search docs, tools, debugging help, or a topic"
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-          />
-          <button type="submit">Search student hub</button>
-        </form>
-        <div className="hero-actions">
-          <a className="secondary-action" href="#faq">
-            Open debugging FAQ
-          </a>
-        </div>
-      </header>
+      <HeroSearchSection
+        title="Cohort Compass"
+        query={searchQuery}
+        onQueryChange={setSearchQuery}
+        onSearch={onSearch}
+        backgroundSrc={heroBackground}
+        secondaryActionLabel="Open debugging FAQ"
+        secondaryActionHref="#faq"
+      />
 
       <section className="compass-focus-band" aria-label="Today at a glance">
         <div className="compass-focus-grid">
