@@ -10,6 +10,8 @@ export async function getCurriculumReferences(req, res) {
   } catch (error) {
     console.error("Error fetching curriculum references:", error);
 
-    res.status(500).json({ error: "Unable to fetch curriculum references." });
+    res.json({
+      curriculumReferences: [],
+    });
   }
 }
