@@ -1,35 +1,25 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import FaqPreview from "./FaqPreview.jsx";
-import { fetchFaqEntries } from "../../services/faqApi.js";
-
-vi.mock("../../services/faqApi.js", () => ({
-  fetchFaqEntries: vi.fn(),
-}));
 
 describe("FaqPreview", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("renders FAQ entries from the API", async () => {
+  it("renders FAQ entries", () => {
     // Arrange
-    fetchFaqEntries.mockResolvedValue([
+    const faqEntries = [
       {
         id: 1,
         question: "Why is my API request failing?",
         answer: "Check the route, server logs, and network response.",
         category: "Debugging",
       },
-    ]);
+    ];
 
     // Act
-    render(<FaqPreview />);
+    render(<FaqPreview faqEntries={faqEntries} />);
 
     // Assert
-    expect(screen.getByText(/loading faq/i)).toBeInTheDocument();
     expect(
-      await screen.findByRole("heading", {
+      screen.getByRole("heading", {
         name: /why is my api request failing/i,
       }),
     ).toBeInTheDocument();
@@ -37,33 +27,17 @@ describe("FaqPreview", () => {
     expect(screen.getByText(/debugging/i)).toBeInTheDocument();
   });
 
-  it("renders an empty message when no FAQ entries are returned", async () => {
-    // Arrange
-    fetchFaqEntries.mockResolvedValue([]);
-
+  it("renders an empty message when no FAQ entries are provided", () => {
     // Act
     render(<FaqPreview />);
 
     // Assert
-    expect(await screen.findByText(/no faq entries yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/no faq entries yet/i)).toBeInTheDocument();
   });
 
-  it("renders an error message when the API request fails", async () => {
+  it("filters FAQ entries by typed search text", () => {
     // Arrange
-    fetchFaqEntries.mockRejectedValue(new Error("FAQ request failed"));
-
-    // Act
-    render(<FaqPreview />);
-
-    // Assert
-    await waitFor(() => {
-      expect(screen.getByText(/faq request failed/i)).toBeInTheDocument();
-    });
-  });
-
-  it("filters FAQ entries by typed search text", async () => {
-    // Arrange
-    fetchFaqEntries.mockResolvedValue([
+    const faqEntries = [
       {
         id: 1,
         question: "Why is my fetch request failing?",
@@ -76,13 +50,13 @@ describe("FaqPreview", () => {
         answer: "Review the conflict markers and choose what to keep.",
         category: "Git & GitHub",
       },
-    ]);
+    ];
 
-    render(<FaqPreview />);
+    render(<FaqPreview faqEntries={faqEntries} />);
 
     // Act
     fireEvent.change(
-      await screen.findByRole("searchbox", { name: /filter faq entries/i }),
+      screen.getByRole("searchbox", { name: /filter faq entries/i }),
       {
         target: { value: "merge" },
       },

@@ -1,11 +1,7 @@
-import { useEffect, useState } from "react";
-import { fetchFaqEntries } from "../../services/faqApi.js";
+import { useState } from "react";
 
-export default function FaqPreview() {
-  const [faqEntries, setFaqEntries] = useState([]);
+export default function FaqPreview({ faqEntries = [] }) {
   const [filterText, setFilterText] = useState("");
-  const [status, setStatus] = useState("loading");
-  const [errorMessage, setErrorMessage] = useState("");
   const normalizedFilterText = filterText.trim().toLowerCase();
   const visibleFaqEntries = normalizedFilterText
     ? faqEntries.filter((entry) =>
@@ -15,30 +11,6 @@ export default function FaqPreview() {
           .includes(normalizedFilterText),
       )
     : faqEntries;
-
-  useEffect(() => {
-    async function loadFaqEntries() {
-      try {
-        const entries = await fetchFaqEntries();
-
-        setFaqEntries(entries);
-        setStatus("success");
-      } catch (error) {
-        setErrorMessage(error.message);
-        setStatus("error");
-      }
-    }
-
-    loadFaqEntries();
-  }, []);
-
-  if (status === "loading") {
-    return <p>Loading FAQ...</p>;
-  }
-
-  if (status === "error") {
-    return <p>{errorMessage}</p>;
-  }
 
   if (!faqEntries.length) {
     return <p>No FAQ entries yet.</p>;
