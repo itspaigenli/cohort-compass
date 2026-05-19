@@ -9,6 +9,8 @@ describe("googleCalendar", () => {
     vi.restoreAllMocks();
     delete process.env.GOOGLE_CALENDAR_ID;
     delete process.env.GOOGLE_API_KEY;
+    delete process.env.GOOGLE_CALENDAR_LOOKAHEAD_DAYS;
+    delete process.env.GOOGLE_CALENDAR_MAX_RESULTS;
   });
 
   it("formats a Google Calendar event into a schedule item", () => {
@@ -81,5 +83,32 @@ describe("googleCalendar", () => {
     expect(scheduleItems[0].meeting_url).toBe(
       "https://calendar.google.com/event-1",
     );
+  });
+
+  it("requests upcoming single calendar events in start time order", async () => {
+    // Arrange
+    process.env.GOOGLE_CALENDAR_ID = "calendar@example.com";
+    process.env.GOOGLE_API_KEY = "test-api-key";
+    process.env.GOOGLE_CALENDAR_LOOKAHEAD_DAYS = "14";
+    process.env.GOOGLE_CALENDAR_MAX_RESULTS = "25";
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ items: [] }),
+    });
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    // Act
+    await getGoogleCalendarScheduleItems();
+
+    // Assert
+    const requestUrl = new URL(fetchMock.mock.calls[0][0]);
+
+    expect(requestUrl.searchParams.get("singleEvents")).toBe("true");
+    expect(requestUrl.searchParams.get("orderBy")).toBe("startTime");
+    expect(requestUrl.searchParams.get("maxResults")).toBe("25");
+    expect(requestUrl.searchParams.get("timeMin")).toBeTruthy();
+    expect(requestUrl.searchParams.get("timeMax")).toBeTruthy();
   });
 });
