@@ -1,17 +1,23 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { query } from "../src/config/db.js";
+import { listCurriculumReferences } from "../src/models/curriculumModel.js";
 import { searchLinksAndFaq } from "../src/models/searchModel.js";
 
 vi.mock("../src/config/db.js", () => ({
   query: vi.fn(),
 }));
 
+vi.mock("../src/models/curriculumModel.js", () => ({
+  listCurriculumReferences: vi.fn(),
+}));
+
 describe("searchLinksAndFaq", () => {
   beforeEach(() => {
     query.mockReset();
+    listCurriculumReferences.mockReset();
   });
 
-  it("returns matching links and FAQ entries from the database", async () => {
+  it("returns matching links, FAQ entries, and curriculum references", async () => {
     // Arrange
     query
       .mockResolvedValueOnce({
@@ -38,6 +44,14 @@ describe("searchLinksAndFaq", () => {
           },
         ],
       });
+    listCurriculumReferences.mockResolvedValue([
+      {
+        slug: "react-js",
+        title: "React JS",
+        relativePath: "react-js",
+        summary: "Techtonica React curriculum reference.",
+      },
+    ]);
 
     // Act
     const results = await searchLinksAndFaq("react");
@@ -49,11 +63,14 @@ describe("searchLinksAndFaq", () => {
     expect(results.faqEntries[0].question).toBe(
       "Why is my useEffect running twice?",
     );
+    expect(results.curriculumReferences).toHaveLength(1);
+    expect(results.curriculumReferences[0].title).toBe("React JS");
   });
 
   it("uses a parameterized search term for both database queries", async () => {
     // Arrange
     query.mockResolvedValue({ rows: [] });
+    listCurriculumReferences.mockResolvedValue([]);
 
     // Act
     await searchLinksAndFaq("react");
@@ -75,6 +92,7 @@ describe("searchLinksAndFaq", () => {
     expect(results).toEqual({
       links: [],
       faqEntries: [],
+      curriculumReferences: [],
     });
     expect(query).not.toHaveBeenCalled();
   });
