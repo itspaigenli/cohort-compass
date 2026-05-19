@@ -18,7 +18,11 @@ vi.mock("../components/dashboard/MonthlyCalendar.jsx", () => ({
 }));
 
 vi.mock("../components/dashboard/RemindersPanel.jsx", () => ({
-  default: () => <p>Reminders preview test content</p>,
+  default: ({ className = "" }) => (
+    <section className={className}>
+      <h2>Reminder list</h2>
+    </section>
+  ),
 }));
 
 describe("DashboardPage", () => {

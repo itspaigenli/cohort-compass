@@ -603,35 +603,17 @@ select {
   color: #ffffff;
 }
 
-.reminder-item-label {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  color: #f7fbfc;
-  font-weight: 700;
-}
-
 .reminders-form {
   display: grid;
-  gap: 0.5rem;
-}
-
-.reminders-form label {
-  color: #f7fbfc;
-  font-weight: 700;
-}
-
-.reminders-form-row {
-  display: flex;
+  grid-template-columns: minmax(12rem, 1fr) minmax(9rem, 0.7fr) minmax(7rem, 0.5fr) auto;
   gap: 0.75rem;
 }
 
 .reminders-form input {
   min-width: 0;
-  flex: 1;
   border: 1px solid rgba(143, 221, 235, 0.2);
   border-radius: 8px;
-  padding: 0.55rem 0.75rem;
+  padding: 0.7rem 0.8rem;
   color: #17313a;
   background: #ffffff;
 }
@@ -644,6 +626,64 @@ select {
   color: #ffffff;
   background: #fc7625;
   cursor: pointer;
+}
+
+.reminders-section button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.reminders-status {
+  margin: 0;
+  color: #f7fbfc;
+}
+
+.stack-list {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mini-card.reminder-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-left-color: #fc7625;
+}
+
+.mini-card.reminder-item.done {
+  opacity: 0.74;
+}
+
+.reminder-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  color: #f7fbfc;
+  font-weight: 700;
+}
+
+.reminder-copy {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.reminder-due-date {
+  color: rgba(247, 251, 252, 0.68);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.reminder-item.done .reminder-copy > span:first-child {
+  text-decoration: line-through;
+}
+
+.inline-button.reminder-remove {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .page-stack {
@@ -866,8 +906,8 @@ select {
     font-size: 0.65rem;
   }
 
-  .reminders-form-row {
-    flex-direction: column;
+  .reminders-form {
+    grid-template-columns: 1fr;
   }
 
   .search-grid {

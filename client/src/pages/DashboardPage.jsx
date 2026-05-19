@@ -15,7 +15,7 @@ export default function DashboardPage({
   const currentDate = new Date();
 
   return (
-    <div className="dashboard-page compass-home">
+    <div className="page-stack dashboard-page compass-home perplexity-inspired-home">
       <HeroSearchSection
         title="Cohort Compass"
         query={searchQuery}
@@ -29,17 +29,11 @@ export default function DashboardPage({
       <section className="compass-focus-band" aria-label="Today at a glance">
         <div className="compass-focus-grid">
           <SchedulePreview scheduleItems={scheduleItems} />
-          <section
-            id="dashboard-reminders"
-            className="reminders-section"
-            aria-labelledby="dashboard-reminders-heading"
-          >
-            <h2 id="dashboard-reminders-heading">Reminder list</h2>
-            <RemindersPanel
-              reminders={reminders}
-              onRemindersChange={onRemindersChange}
-            />
-          </section>
+          <RemindersPanel
+            reminders={reminders}
+            onRemindersChange={onRemindersChange}
+            className="compass-reminders-surface"
+          />
         </div>
       </section>
 

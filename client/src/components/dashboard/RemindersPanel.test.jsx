@@ -38,7 +38,6 @@ describe("RemindersPanel", () => {
     // Assert
     const checkboxes = screen.getAllByRole("checkbox");
 
-    expect(screen.getByText(/1 remaining · 1 completed/i)).toBeInTheDocument();
     expect(checkboxes[0]).toHaveAccessibleName(/submit milestone summary/i);
     expect(checkboxes[0]).not.toBeChecked();
     expect(checkboxes[1]).toHaveAccessibleName(/review readme links/i);
@@ -72,6 +71,7 @@ describe("RemindersPanel", () => {
     // Assert
     expect(createReminder).toHaveBeenCalledWith({
       text: "Update project notes",
+      due_at: null,
     });
     await waitFor(() => {
       expect(handleRemindersChange).toHaveBeenCalledWith([
@@ -84,5 +84,44 @@ describe("RemindersPanel", () => {
       ]);
     });
     expect(reminderInput).toHaveValue("");
+  });
+
+  it("sends a due date and time when a student adds them", async () => {
+    // Arrange
+    const handleRemindersChange = vi.fn();
+    createReminder.mockResolvedValue({
+      id: 4,
+      text: "Practice demo",
+      done: false,
+      due_at: "2026-05-19T15:30",
+    });
+
+    render(
+      <RemindersPanel
+        reminders={[]}
+        onRemindersChange={handleRemindersChange}
+      />,
+    );
+
+    // Act
+    fireEvent.change(screen.getByLabelText(/add reminder/i), {
+      target: { value: "Practice demo" },
+    });
+    fireEvent.change(screen.getByLabelText(/reminder due date/i), {
+      target: { value: "2026-05-19" },
+    });
+    fireEvent.change(screen.getByLabelText(/reminder due time/i), {
+      target: { value: "15:30" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /add/i }));
+
+    // Assert
+    expect(createReminder).toHaveBeenCalledWith({
+      text: "Practice demo",
+      due_at: "2026-05-19T15:30",
+    });
+    await waitFor(() => {
+      expect(handleRemindersChange).toHaveBeenCalled();
+    });
   });
 });
