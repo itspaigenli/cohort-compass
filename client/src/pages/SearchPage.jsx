@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SearchResultsSection from "../components/search/SearchResultsSection.jsx";
 import { searchStudentHub } from "../services/searchApi.js";
+import { getSuggestedVideos } from "../utils/videoSuggestions.js";
 
 function openResultUrl(url) {
   if (!url) {
@@ -69,6 +70,24 @@ function renderCurriculumResult(reference) {
   );
 }
 
+function renderVideoResult(video) {
+  return (
+    <article
+      key={video.id}
+      className="search-result-card search-result-card-clickable"
+      role="link"
+      tabIndex={0}
+      onClick={() => openResultUrl(video.url)}
+      onKeyDown={(event) => handleResultKeyDown(event, video.url)}
+    >
+      <p className="item-meta">{video.topic}</p>
+      <h3>{video.title}</h3>
+      <p>{video.description}</p>
+      <span className="search-result-link-label">Open YouTube results</span>
+    </article>
+  );
+}
+
 export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedSearchTerm, setSubmittedSearchTerm] = useState("");
@@ -79,7 +98,9 @@ export default function SearchPage() {
   });
   const [status, setStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const suggestedVideos = getSuggestedVideos(submittedSearchTerm);
   const totalResults =
+    suggestedVideos.length +
     results.links.length +
     results.faqEntries.length +
     results.curriculumReferences.length;
@@ -145,11 +166,19 @@ export default function SearchPage() {
             <span className="status-pill">
               {results.curriculumReferences.length} curriculum
             </span>
+            <span className="status-pill">{suggestedVideos.length} videos</span>
           </div>
           {status === "loading" ? <p>Loading search results...</p> : null}
           {status === "error" ? <p>{errorMessage}</p> : null}
           {status === "success" ? (
             <div className="search-results-grid">
+              <SearchResultsSection
+                id="search-videos"
+                title="Suggested Videos"
+                items={suggestedVideos}
+                emptyLabel="No suggested videos matched your search."
+                renderItem={renderVideoResult}
+              />
               <SearchResultsSection
                 id="search-links"
                 title="Links"
