@@ -16,6 +16,9 @@ describe("MonthlyCalendar", () => {
     // Arrange
     render(<MonthlyCalendar />);
 
+    // Act
+    // No user action is needed because the current month renders immediately.
+
     // Assert
     expect(screen.getByText(/may 2026/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "18" })).toHaveClass("today");
@@ -56,6 +59,9 @@ describe("MonthlyCalendar", () => {
         ]}
       />,
     );
+
+    // Act
+    // No user action is needed because matching items render in the month grid.
 
     // Assert
     expect(screen.getByRole("link", { name: /1 event/i })).toBeInTheDocument();

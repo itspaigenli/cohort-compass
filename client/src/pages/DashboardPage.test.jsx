@@ -26,7 +26,7 @@ vi.mock("../components/dashboard/RemindersPanel.jsx", () => ({
 }));
 
 describe("DashboardPage", () => {
-  it("renders the mock-final style dashboard sections", () => {
+  it("renders the spec-style dashboard sections", () => {
     // Arrange
     render(<DashboardPage />);
 

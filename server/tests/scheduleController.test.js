@@ -98,7 +98,7 @@ describe("listSchedule", () => {
     expect(response.body).toEqual({ scheduleItems: databaseItems });
   });
 
-  it("passes date filters to database schedule fallback loading", async () => {
+  it("passes date filters to database schedule loading", async () => {
     // Arrange
     const response = createResponseMock();
     const databaseItems = [

@@ -31,43 +31,64 @@ const faqEntries = [
 
 describe("FAQPage", () => {
   it("renders the FAQ page heading", () => {
+    // Arrange
     render(<FAQPage faqEntries={faqEntries} query="" />);
 
+    // Act
+    // No user action is needed because the page renders from props.
+
+    // Assert
     expect(screen.getByRole("heading", { name: "Debugging FAQ" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Back to search" })).toHaveAttribute("href", "#search");
     expect(screen.getByRole("button", { name: "Back to top" })).toBeInTheDocument();
   });
 
   it("maps chip categories to matching faq entries", () => {
+    // Arrange
     render(<FAQPage faqEntries={faqEntries} query="" />);
 
+    // Act
     fireEvent.click(screen.getByRole("button", { name: "React + Vite" }));
 
+    // Assert
     expect(screen.getByText("Search for a keyword to see matching FAQ entries.")).toBeInTheDocument();
     expect(screen.queryByText("Why is my useEffect running twice?")).not.toBeInTheDocument();
   });
 
   it("lets users clear an active topic by clicking the same chip again", () => {
+    // Arrange
     render(<FAQPage faqEntries={faqEntries} query="useEffect" />);
 
+    // Act
     fireEvent.click(screen.getByRole("button", { name: "Node & Express" }));
+
+    // Assert
     expect(screen.queryByText("Why is my useEffect running twice?")).not.toBeInTheDocument();
 
+    // Act
     fireEvent.click(screen.getByRole("button", { name: "Node & Express" }));
+
+    // Assert
     expect(screen.getByText("Why is my useEffect running twice?")).toBeInTheDocument();
   });
 
   it("keeps results empty until a search keyword is entered", () => {
+    // Arrange
     render(<FAQPage faqEntries={faqEntries} query="" />);
 
+    // Act
     fireEvent.click(screen.getByRole("button", { name: "Node & Express" }));
+
+    // Assert
     expect(screen.queryByText("Why does my Express route return 404?")).not.toBeInTheDocument();
 
+    // Act
     fireEvent.change(screen.getByLabelText("Search FAQ questions and answers"), {
       target: { value: "route" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Browse Answers" }));
 
+    // Assert
     expect(screen.getByText("Why does my Express route return 404?")).toBeInTheDocument();
     expect(screen.queryByText("Why is Vite not picking up my latest changes?")).not.toBeInTheDocument();
   });

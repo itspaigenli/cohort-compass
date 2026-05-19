@@ -4,6 +4,7 @@ import {
   deleteReminder,
   updateReminder,
 } from "../../services/remindersApi.js";
+import { formatReminderDueDate, parseCalendarDate } from "../../utils/dateTime.js";
 
 function sortReminders(items = []) {
   return [...items].sort((left, right) => {
@@ -11,8 +12,8 @@ function sortReminders(items = []) {
       return Number(left.done) - Number(right.done);
     }
 
-    const leftCreatedAt = new Date(left.created_at || 0).getTime();
-    const rightCreatedAt = new Date(right.created_at || 0).getTime();
+    const leftCreatedAt = left.created_at ? parseCalendarDate(left.created_at).getTime() : 0;
+    const rightCreatedAt = right.created_at ? parseCalendarDate(right.created_at).getTime() : 0;
 
     return rightCreatedAt - leftCreatedAt;
   });
@@ -28,29 +29,6 @@ function buildDueAt(dateValue, timeValue) {
   }
 
   return `${dateValue}T${timeValue}`;
-}
-
-function hasTime(value) {
-  return typeof value === "string" && /T\d{2}:\d{2}/.test(value);
-}
-
-function formatDueDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  const parsed = new Date(value);
-
-  if (Number.isNaN(parsed.getTime())) {
-    return "";
-  }
-
-  return parsed.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: hasTime(value) ? "numeric" : undefined,
-    minute: hasTime(value) ? "2-digit" : undefined,
-  });
 }
 
 export default function RemindersPanel({
@@ -167,7 +145,7 @@ export default function RemindersPanel({
       {sortedReminders.length ? (
         <ul className="stack-list reminders-list">
           {sortedReminders.map((reminder) => {
-            const dueDate = formatDueDate(reminder.due_at);
+            const dueDate = formatReminderDueDate(reminder.due_at);
 
             return (
               <li

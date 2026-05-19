@@ -20,7 +20,7 @@ Cohort Compass is a PERN student hub for Techtonica participants. It helps stude
 - Important links and FAQ data loaded from the backend
 - Reminder list backed by the database
 - Monthly calendar view on the dashboard
-- Schedule items connected to the monthly calendar and schedule preview, with optional Google Calendar source and database fallback
+- Schedule items connected to the monthly calendar and schedule preview, with optional Google Calendar source and database schedule data
 - Techtonica curriculum references loaded from the GitHub repo tree
 - compass-content markdown documents loaded from local content files when available
 - Frontend and backend tests for key MVP behavior
@@ -105,7 +105,7 @@ COMPASS_CONTENT_REPO_BASE=https://github.com/itspaigenli/compass-content/blob/ma
 ```
 
 Google Calendar values are optional for local development. If they are not set,
-the schedule uses the PostgreSQL `schedule_items` fallback data.
+the schedule uses the PostgreSQL `schedule_items` data.
 
 The compass-content values are optional. If the local content repository is not
 available, the content endpoint returns an empty list instead of breaking the app.

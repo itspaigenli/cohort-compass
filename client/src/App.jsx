@@ -129,7 +129,6 @@ function App() {
       setScheduleItems(nextScheduleItems);
       setContentDocuments(nextContentDocuments);
       setCurriculumReferences(nextCurriculumReferences);
-      setSearchResults(await searchStudentHub(""));
       setLoading(false);
     }
 
@@ -175,7 +174,6 @@ function App() {
       onRemindersChange={setReminders}
       scheduleItems={scheduleItems}
       onLoadScheduleItems={fetchScheduleItems}
-      contentDocuments={contentDocuments}
       onSearch={handleDashboardSearch}
     />
   );

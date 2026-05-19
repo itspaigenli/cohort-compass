@@ -4,6 +4,7 @@ import FAQCard from "./FAQCard.jsx";
 
 describe("FAQCard", () => {
   it("renders the question and answer", () => {
+    // Arrange
     render(
       <FAQCard
         entry={{
@@ -15,6 +16,10 @@ describe("FAQCard", () => {
       />,
     );
 
+    // Act
+    // No user action is needed because the card renders from props.
+
+    // Assert
     expect(screen.getByText("Why is my fetch failing?")).toBeInTheDocument();
   });
 });

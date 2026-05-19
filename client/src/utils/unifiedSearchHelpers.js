@@ -69,20 +69,20 @@ export function buildLocalUnifiedSearchResults({
   };
 }
 
-export function mergeUnifiedSearchResults(primary, fallback) {
+export function mergeUnifiedSearchResults(primary, localResults) {
   return {
-    query: primary.query || fallback.query,
-    links: uniqueBy([...(primary.links || []), ...(fallback.links || [])], searchResultKeyBuilders.links),
+    query: primary.query || localResults.query,
+    links: uniqueBy([...(primary.links || []), ...(localResults.links || [])], searchResultKeyBuilders.links),
     faqEntries: uniqueBy(
-      [...(primary.faqEntries || []), ...(fallback.faqEntries || [])],
+      [...(primary.faqEntries || []), ...(localResults.faqEntries || [])],
       searchResultKeyBuilders.faqEntries,
     ),
     contentDocuments: uniqueBy(
-      [...(primary.contentDocuments || []), ...(fallback.contentDocuments || [])],
+      [...(primary.contentDocuments || []), ...(localResults.contentDocuments || [])],
       searchResultKeyBuilders.contentDocuments,
     ),
     curriculumReferences: uniqueBy(
-      [...(primary.curriculumReferences || []), ...(fallback.curriculumReferences || [])],
+      [...(primary.curriculumReferences || []), ...(localResults.curriculumReferences || [])],
       searchResultKeyBuilders.curriculumReferences,
     ),
   };

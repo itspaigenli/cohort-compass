@@ -18,6 +18,7 @@ describe("GET /api/schedule", () => {
   });
 
   it("returns schedule items from Google Calendar when available", async () => {
+    // Arrange
     const scheduleItems = [
       {
         id: "event-1",
@@ -28,8 +29,10 @@ describe("GET /api/schedule", () => {
 
     getGoogleCalendarScheduleItems.mockResolvedValue(scheduleItems);
 
+    // Act
     const response = await request(app).get("/api/schedule?date=2026-05-20");
 
+    // Assert
     expect(response.status).toBe(200);
     expect(getGoogleCalendarScheduleItems).toHaveBeenCalledWith({
       date: "2026-05-20",
@@ -38,6 +41,7 @@ describe("GET /api/schedule", () => {
   });
 
   it("uses database schedule items when Google Calendar is unavailable", async () => {
+    // Arrange
     const scheduleItems = [
       {
         id: 1,
@@ -49,8 +53,10 @@ describe("GET /api/schedule", () => {
     getGoogleCalendarScheduleItems.mockResolvedValue(null);
     listScheduleItems.mockResolvedValue(scheduleItems);
 
+    // Act
     const response = await request(app).get("/api/schedule");
 
+    // Assert
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ scheduleItems });
   });

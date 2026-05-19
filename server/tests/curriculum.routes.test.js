@@ -13,6 +13,7 @@ describe("GET /api/curriculum", () => {
   });
 
   it("returns curriculum references from the curriculum model", async () => {
+    // Arrange
     const curriculumReferences = [
       {
         slug: "react-js",
@@ -22,8 +23,10 @@ describe("GET /api/curriculum", () => {
 
     listCurriculumReferences.mockResolvedValue(curriculumReferences);
 
+    // Act
     const response = await request(app).get("/api/curriculum");
 
+    // Assert
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ curriculumReferences });
   });

@@ -27,6 +27,7 @@ describe("searchContent", () => {
   });
 
   it("returns grouped search results from the search model", async () => {
+    // Arrange
     const response = createResponseMock();
     const results = {
       links: [],
@@ -37,14 +38,17 @@ describe("searchContent", () => {
 
     searchLinksAndFaq.mockResolvedValue(results);
 
+    // Act
     await searchContent({ query: { q: "react" } }, response);
 
+    // Assert
     expect(searchLinksAndFaq).toHaveBeenCalledWith("react");
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(results);
   });
 
   it("uses an empty search term when q is missing", async () => {
+    // Arrange
     const response = createResponseMock();
 
     searchLinksAndFaq.mockResolvedValue({
@@ -54,8 +58,10 @@ describe("searchContent", () => {
       contentDocuments: [],
     });
 
+    // Act
     await searchContent({ query: {} }, response);
 
+    // Assert
     expect(searchLinksAndFaq).toHaveBeenCalledWith("");
   });
 });

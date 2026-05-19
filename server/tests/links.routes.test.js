@@ -13,6 +13,7 @@ describe("GET /api/links", () => {
   });
 
   it("returns important links from the links model", async () => {
+    // Arrange
     const links = [
       {
         id: 1,
@@ -24,8 +25,10 @@ describe("GET /api/links", () => {
 
     listLinks.mockResolvedValue(links);
 
+    // Act
     const response = await request(app).get("/api/links");
 
+    // Assert
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ links });
   });

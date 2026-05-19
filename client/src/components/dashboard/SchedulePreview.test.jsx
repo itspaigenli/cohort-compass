@@ -23,6 +23,7 @@ describe("SchedulePreview", () => {
   });
 
   it("renders schedule items", () => {
+    // Arrange
     render(
       <SchedulePreview
         items={[
@@ -47,6 +48,10 @@ describe("SchedulePreview", () => {
       />,
     );
 
+    // Act
+    // No user action is needed because the schedule renders from props.
+
+    // Assert
     expect(screen.getByRole("heading", { name: "Two-day snapshot" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Today · Tuesday May 5" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Tomorrow · Wednesday May 6" })).toBeInTheDocument();
@@ -61,6 +66,7 @@ describe("SchedulePreview", () => {
   });
 
   it("shows an empty state when there are no events today", () => {
+    // Arrange
     render(
       <SchedulePreview
         items={[
@@ -75,10 +81,15 @@ describe("SchedulePreview", () => {
       />,
     );
 
+    // Act
+    // No user action is needed because the day has no matching items.
+
+    // Assert
     expect(screen.getByText("No events on this day's calendar.")).toBeInTheDocument();
   });
 
   it("lets the user move forward and backward by two-day windows", () => {
+    // Arrange
     render(
       <SchedulePreview
         items={[
@@ -114,8 +125,10 @@ describe("SchedulePreview", () => {
       />,
     );
 
+    // Act
     fireEvent.click(screen.getByRole("button", { name: "Next days" }));
 
+    // Assert
     expect(screen.getByRole("heading", { name: "Two-day snapshot" })).toBeInTheDocument();
     expect(screen.getByText("Day after tomorrow item")).toBeInTheDocument();
     expect(screen.getByText("Two days ahead item")).toBeInTheDocument();
@@ -124,13 +137,16 @@ describe("SchedulePreview", () => {
     expect(screen.queryByText("Today item")).not.toBeInTheDocument();
     expect(screen.queryByText("Tomorrow item")).not.toBeInTheDocument();
 
+    // Act
     fireEvent.click(screen.getByRole("button", { name: "Previous days" }));
 
+    // Assert
     expect(screen.getByRole("heading", { name: "Two-day snapshot" })).toBeInTheDocument();
     expect(screen.getByText("Today item")).toBeInTheDocument();
   });
 
   it("treats date-only events as local calendar days", () => {
+    // Arrange
     render(
       <SchedulePreview
         items={[
@@ -144,11 +160,16 @@ describe("SchedulePreview", () => {
       />,
     );
 
+    // Act
+    // No user action is needed because the all-day item renders from props.
+
+    // Assert
     expect(screen.getByText("All day cohort work")).toBeInTheDocument();
     expect(screen.getByText("May 6 · All day")).toBeInTheDocument();
   });
 
   it("loads schedule items for the selected day from the server callback", async () => {
+    // Arrange
     vi.useRealTimers();
 
     const onLoadItemsForDate = vi.fn(async ({ date }) => {
@@ -174,13 +195,16 @@ describe("SchedulePreview", () => {
 
     render(<SchedulePreview items={[]} onLoadItemsForDate={onLoadItemsForDate} />);
 
+    // Assert
     await waitFor(() => {
       expect(screen.getByText("Fetched current day item")).toBeInTheDocument();
     });
     expect(screen.getByText("Fetched next day item")).toBeInTheDocument();
 
+    // Act
     fireEvent.click(screen.getByRole("button", { name: "Next days" }));
 
+    // Assert
     await waitFor(() => {
       expect(screen.getAllByText("Fetched later day item")).toHaveLength(2);
     });
@@ -189,6 +213,7 @@ describe("SchedulePreview", () => {
   });
 
   it("shows one day at a time on mobile and advances by one day", () => {
+    // Arrange
     window.matchMedia = vi.fn().mockImplementation((query) => ({
       matches: query === "(max-width: 960px)",
       media: query,
@@ -219,12 +244,15 @@ describe("SchedulePreview", () => {
       />,
     );
 
+    // Assert
     expect(screen.getByRole("heading", { name: "Day snapshot" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Today · Tuesday May 5" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Tomorrow · Wednesday May 6" })).not.toBeInTheDocument();
 
+    // Act
     fireEvent.click(screen.getByRole("button", { name: "Next days" }));
 
+    // Assert
     expect(screen.getByRole("heading", { name: "Wednesday May 6" })).toBeInTheDocument();
     expect(screen.getByText("Tomorrow item")).toBeInTheDocument();
   });

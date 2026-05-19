@@ -6,8 +6,12 @@ import {
 
 describe("unifiedSearchHelpers", () => {
   it("matches content documents by primary metadata", () => {
+    // Arrange
+    const query = "html";
+
+    // Act
     const results = buildLocalUnifiedSearchResults({
-      query: "html",
+      query,
       links: [],
       faqEntries: [],
       contentDocuments: [
@@ -27,12 +31,17 @@ describe("unifiedSearchHelpers", () => {
       curriculumReferences: [],
     });
 
+    // Assert
     expect(results.contentDocuments).toHaveLength(1);
   });
 
   it("does not match content documents on weak body-only mentions", () => {
+    // Arrange
+    const query = "coding challenges";
+
+    // Act
     const results = buildLocalUnifiedSearchResults({
-      query: "coding challenges",
+      query,
       links: [],
       faqEntries: [],
       contentDocuments: [
@@ -52,12 +61,17 @@ describe("unifiedSearchHelpers", () => {
       curriculumReferences: [],
     });
 
+    // Assert
     expect(results.contentDocuments).toHaveLength(0);
   });
 
   it("matches curriculum references across coding/code challenge variants", () => {
+    // Arrange
+    const query = "coding challenges";
+
+    // Act
     const results = buildLocalUnifiedSearchResults({
-      query: "coding challenges",
+      query,
       links: [],
       faqEntries: [],
       contentDocuments: [],
@@ -72,12 +86,17 @@ describe("unifiedSearchHelpers", () => {
       ],
     });
 
+    // Assert
     expect(results.curriculumReferences).toHaveLength(1);
   });
 
   it("matches faq entries by question and error topic", () => {
+    // Arrange
+    const query = "merge conflict";
+
+    // Act
     const results = buildLocalUnifiedSearchResults({
-      query: "merge conflict",
+      query,
       links: [],
       faqEntries: [
         {
@@ -93,33 +112,40 @@ describe("unifiedSearchHelpers", () => {
       curriculumReferences: [],
     });
 
+    // Assert
     expect(results.faqEntries).toHaveLength(1);
   });
 
-  it("merges server and fallback results without duplicates", () => {
+  it("merges server and local results without duplicates", () => {
+    // Arrange
+    const serverResults = {
+      query: "html",
+      links: [],
+      faqEntries: [{ id: 1, question: "HTML FAQ" }],
+      contentDocuments: [{ slug: "html-docs", title: "HTML Docs" }],
+      curriculumReferences: [],
+    };
+    const localResults = {
+      query: "html",
+      links: [],
+      faqEntries: [
+        { id: 1, question: "HTML FAQ" },
+        { id: 2, question: "CSS FAQ" },
+      ],
+      contentDocuments: [
+        { slug: "html-docs", title: "HTML Docs" },
+        { slug: "html-forms", title: "HTML Forms" },
+      ],
+      curriculumReferences: [],
+    };
+
+    // Act
     const merged = mergeUnifiedSearchResults(
-      {
-        query: "html",
-        links: [],
-        faqEntries: [{ id: 1, question: "HTML FAQ" }],
-        contentDocuments: [{ slug: "html-docs", title: "HTML Docs" }],
-        curriculumReferences: [],
-      },
-      {
-        query: "html",
-        links: [],
-        faqEntries: [
-          { id: 1, question: "HTML FAQ" },
-          { id: 2, question: "CSS FAQ" },
-        ],
-        contentDocuments: [
-          { slug: "html-docs", title: "HTML Docs" },
-          { slug: "html-forms", title: "HTML Forms" },
-        ],
-        curriculumReferences: [],
-      },
+      serverResults,
+      localResults,
     );
 
+    // Assert
     expect(merged.faqEntries).toHaveLength(2);
     expect(merged.contentDocuments).toHaveLength(2);
   });

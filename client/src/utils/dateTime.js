@@ -101,6 +101,24 @@ export function formatOptionalTime(value, timeZone = DEFAULT_TIME_ZONE) {
   return formatInTimeZone(value, timeZone, "h:mm a");
 }
 
+export function formatReminderDueDate(value, timeZone = DEFAULT_TIME_ZONE) {
+  if (!value) {
+    return "";
+  }
+
+  const parsedDate = parseCalendarDate(value);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "";
+  }
+
+  if (isDateOnlyValue(value)) {
+    return format(parsedDate, "MMM d");
+  }
+
+  return formatInTimeZone(value, timeZone, "MMM d, h:mm a");
+}
+
 export function normalizeScheduleItem(item, timeZone = DEFAULT_TIME_ZONE) {
   const startDateTime = item.start_time && !isDateOnlyValue(item.start_time)
     ? toZonedTime(item.start_time, timeZone)

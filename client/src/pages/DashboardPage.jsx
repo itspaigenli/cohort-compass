@@ -34,7 +34,6 @@ export default function DashboardPage({
         <div className="compass-focus-grid">
           <SchedulePreview
             items={scheduleItems}
-            onLoadItemsForDate={onLoadScheduleItems}
             className="compass-snapshot-surface"
           />
           <RemindersPanel

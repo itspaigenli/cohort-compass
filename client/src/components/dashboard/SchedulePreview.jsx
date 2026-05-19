@@ -103,7 +103,7 @@ export default function SchedulePreview({
 
     async function loadItemsForDay(targetDate) {
       const dateKey = toDateKey(targetDate);
-      const fallbackItems = normalizedItems.filter((item) =>
+      const localItems = normalizedItems.filter((item) =>
         isSameCalendarDay(item.start_time, targetDate),
       );
 
@@ -111,7 +111,7 @@ export default function SchedulePreview({
         if (!cancelled) {
           setDayCollections((current) => ({
             ...current,
-            [dateKey]: fallbackItems,
+            [dateKey]: localItems,
           }));
         }
         return;
@@ -123,14 +123,14 @@ export default function SchedulePreview({
         if (!cancelled) {
           setDayCollections((current) => ({
             ...current,
-            [dateKey]: nextItems.length || !fallbackItems.length ? nextItems : fallbackItems,
+            [dateKey]: nextItems.length || !localItems.length ? nextItems : localItems,
           }));
         }
       } catch {
         if (!cancelled) {
           setDayCollections((current) => ({
             ...current,
-            [dateKey]: fallbackItems,
+            [dateKey]: localItems,
           }));
         }
       }

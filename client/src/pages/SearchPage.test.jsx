@@ -4,6 +4,7 @@ import SearchPage from "./SearchPage.jsx";
 
 describe("SearchPage", () => {
   it("renders the shared hero heading and search summary", () => {
+    // Arrange
     render(
       <SearchPage
         query="react"
@@ -17,6 +18,10 @@ describe("SearchPage", () => {
       />,
     );
 
+    // Act
+    // No user action is needed because results are provided as props.
+
+    // Assert
     expect(screen.getByRole("heading", { name: "Search the Student Hub" })).toBeInTheDocument();
     expect(screen.getByText('Results for "react"')).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Back to homepage" })).toHaveAttribute("href", "#dashboard");
@@ -33,6 +38,7 @@ describe("SearchPage", () => {
   });
 
   it("shows empty result cards before any search runs", () => {
+    // Arrange
     render(
       <SearchPage
         query=""
@@ -46,6 +52,10 @@ describe("SearchPage", () => {
       />,
     );
 
+    // Act
+    // No user action is needed because the query starts empty.
+
+    // Assert
     expect(screen.getByRole("heading", { name: "Suggested Videos" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Links" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Techtonica Curriculum Repo" })).toBeInTheDocument();
@@ -58,6 +68,7 @@ describe("SearchPage", () => {
   });
 
   it("shows curated video suggestions for known topics", () => {
+    // Arrange
     render(
       <SearchPage
         query="html"
@@ -71,12 +82,17 @@ describe("SearchPage", () => {
       />,
     );
 
+    // Act
+    // No user action is needed because the query is provided as a prop.
+
+    // Assert
     expect(screen.getByRole("heading", { name: "Suggested Videos" })).toBeInTheDocument();
     expect(screen.getByText("HTML Full Course for Beginners")).toBeInTheDocument();
     expect(screen.getByLabelText("Search summary")).toBeInTheDocument();
   });
 
   it("shows FAQ matches in a dedicated search section", () => {
+    // Arrange
     render(
       <SearchPage
         query="git"
@@ -98,6 +114,10 @@ describe("SearchPage", () => {
       />,
     );
 
+    // Act
+    // No user action is needed because FAQ results are provided as props.
+
+    // Assert
     expect(screen.getByRole("heading", { name: "Debugging FAQ" })).toBeInTheDocument();
     expect(screen.getByText("How do I fix a merge conflict?")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Browse full FAQ" })).toHaveAttribute("href", "#faq");
@@ -107,6 +127,7 @@ describe("SearchPage", () => {
   });
 
   it("opens the matching section on mobile when a summary pill is clicked", async () => {
+    // Arrange
     const originalInnerWidth = window.innerWidth;
     const originalScrollIntoView = window.HTMLElement.prototype.scrollIntoView;
     const scrollIntoView = vi.fn();
@@ -140,10 +161,13 @@ describe("SearchPage", () => {
       />,
     );
 
+    // Assert
     expect(screen.queryByText("How do I fix a merge conflict?")).not.toBeInTheDocument();
 
+    // Act
     fireEvent.click(screen.getByRole("button", { name: "1 faq" }));
 
+    // Assert
     expect(screen.getByText("How do I fix a merge conflict?")).toBeInTheDocument();
 
     Object.defineProperty(window, "innerWidth", {

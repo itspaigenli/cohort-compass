@@ -4,6 +4,7 @@ import FAQList from "./FAQList.jsx";
 
 describe("FAQList", () => {
   it("renders each FAQ entry", () => {
+    // Arrange
     render(
       <FAQList
         entries={[
@@ -18,6 +19,10 @@ describe("FAQList", () => {
       />,
     );
 
+    // Act
+    // No user action is needed because the list renders from props.
+
+    // Assert
     expect(screen.getByText("What is a merge conflict?")).toBeInTheDocument();
   });
 });

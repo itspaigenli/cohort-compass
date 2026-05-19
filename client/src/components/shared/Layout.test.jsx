@@ -11,6 +11,9 @@ describe("Layout", () => {
       </Layout>,
     );
 
+    // Act
+    // No user action is needed because the layout renders static content.
+
     // Assert
     expect(screen.getByText(/page content/i)).toBeInTheDocument();
     expect(screen.getByText(/© techtonica 2026/i)).toBeInTheDocument();

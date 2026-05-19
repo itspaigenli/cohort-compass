@@ -13,6 +13,7 @@ describe("GET /api/faq", () => {
   });
 
   it("returns FAQ entries from the FAQ model", async () => {
+    // Arrange
     const faqEntries = [
       {
         id: 1,
@@ -23,8 +24,10 @@ describe("GET /api/faq", () => {
 
     listFaqEntries.mockResolvedValue(faqEntries);
 
+    // Act
     const response = await request(app).get("/api/faq");
 
+    // Assert
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ faqEntries });
   });
