@@ -1,4 +1,5 @@
 import { query } from "../config/db.js";
+import { listContentDocuments } from "./contentModel.js";
 import { listCurriculumReferences } from "./curriculumModel.js";
 
 function matchesSearchTerm(value, searchTerm) {
@@ -16,6 +17,20 @@ function filterCurriculumReferences(references, searchTerm) {
   );
 }
 
+function filterContentDocuments(documents, searchTerm) {
+  return documents.filter((document) =>
+    [
+      document.title,
+      document.relativePath,
+      document.summary,
+      document.excerpt,
+      document.section,
+      document.category,
+      document.topic,
+    ].some((value) => matchesSearchTerm(value, searchTerm)),
+  );
+}
+
 export async function searchLinksAndFaq(searchTerm) {
   const normalizedSearchTerm = searchTerm.trim().toLowerCase();
 
@@ -24,6 +39,7 @@ export async function searchLinksAndFaq(searchTerm) {
       links: [],
       faqEntries: [],
       curriculumReferences: [],
+      contentDocuments: [],
     };
   }
 
@@ -84,6 +100,7 @@ export async function searchLinksAndFaq(searchTerm) {
     [searchPattern],
   );
   const curriculumReferences = await listCurriculumReferences();
+  const contentDocuments = await listContentDocuments();
 
   return {
     links: linksResult.rows,
@@ -92,5 +109,6 @@ export async function searchLinksAndFaq(searchTerm) {
       curriculumReferences,
       normalizedSearchTerm,
     ),
+    contentDocuments: filterContentDocuments(contentDocuments, normalizedSearchTerm),
   };
 }
