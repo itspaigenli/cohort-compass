@@ -52,9 +52,9 @@ export default function DashboardPage({
           <h2 id="calendar-band-heading">Plan your week</h2>
         </div>
         <MonthlyCalendar
-          year={currentDate.getFullYear()}
-          monthIndex={currentDate.getMonth()}
           scheduleItems={scheduleItems}
+          reminders={reminders}
+          today={currentDate}
         />
       </section>
     </div>

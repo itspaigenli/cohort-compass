@@ -9,8 +9,11 @@ vi.mock("../components/dashboard/SchedulePreview.jsx", () => ({
 }));
 
 vi.mock("../components/dashboard/MonthlyCalendar.jsx", () => ({
-  default: ({ scheduleItems = [] }) => (
-    <p>Monthly calendar received {scheduleItems.length} schedule item</p>
+  default: ({ scheduleItems = [], reminders = [] }) => (
+    <p>
+      Monthly calendar received {scheduleItems.length} schedule item and{" "}
+      {reminders.length} reminder
+    </p>
   ),
 }));
 
@@ -67,6 +70,13 @@ describe("DashboardPage", () => {
             start_time: "2026-05-15T19:30:00.000Z",
           },
         ]}
+        reminders={[
+          {
+            id: 2,
+            text: "Update notes",
+            due_at: "2026-05-15",
+          },
+        ]}
       />,
     );
 
@@ -75,7 +85,9 @@ describe("DashboardPage", () => {
 
     // Assert
     expect(
-      await screen.findByText(/monthly calendar received 1 schedule item/i),
+      await screen.findByText(
+        /monthly calendar received 1 schedule item and 1 reminder/i,
+      ),
     ).toBeInTheDocument();
   });
 });
