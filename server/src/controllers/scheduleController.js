@@ -1,8 +1,10 @@
+import { getGoogleCalendarScheduleItems } from "../lib/googleCalendar.js";
 import { listScheduleItems } from "../models/scheduleModel.js";
 
 export async function listSchedule(req, res) {
   try {
-    const scheduleItems = await listScheduleItems();
+    const calendarScheduleItems = await getGoogleCalendarScheduleItems();
+    const scheduleItems = calendarScheduleItems || await listScheduleItems();
 
     res.json({
       scheduleItems,
