@@ -13,10 +13,23 @@ import { searchLinksAndFaq } from "./models/searchModel.js";
 dotenv.config();
 
 const app = express();
+const allowedClientOrigins = [
+  process.env.CLIENT_ORIGIN,
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+].filter(Boolean);
 
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN,
+    origin(origin, callback) {
+      if (!origin || allowedClientOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
   }),
 );
 
