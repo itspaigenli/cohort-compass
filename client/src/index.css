@@ -194,6 +194,101 @@ select {
   outline: none;
 }
 
+.compass-focus-band,
+.compass-calendar-band {
+  margin-top: 0.85rem;
+}
+
+.compass-focus-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.compass-calendar-band {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(143, 221, 235, 0.18);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.compass-calendar-band-header h2,
+.panel-header h2 {
+  margin: 0;
+  color: #ffffff;
+}
+
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.schedule-preview,
+.compass-focus-grid .reminders-section {
+  margin-top: 0;
+}
+
+.schedule-source-note {
+  margin: 0;
+  color: rgba(247, 251, 252, 0.68);
+  font-size: 0.85rem;
+  text-align: right;
+}
+
+.schedule-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.schedule-day {
+  display: grid;
+  align-content: start;
+  gap: 0.8rem;
+  min-height: 14rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.schedule-day h3,
+.schedule-card h4 {
+  margin: 0;
+  color: #ffffff;
+}
+
+.schedule-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.schedule-card {
+  display: grid;
+  gap: 0.35rem;
+  border: 1px solid rgba(143, 221, 235, 0.16);
+  border-radius: 1rem;
+  padding: 1rem;
+  background: rgba(143, 221, 235, 0.14);
+}
+
+.schedule-card p,
+.schedule-card a {
+  margin: 0;
+  color: rgba(247, 251, 252, 0.78);
+}
+
+.schedule-card a {
+  color: #8fddeb;
+  font-weight: 700;
+}
+
 .quick-find {
   display: grid;
   gap: 0.8rem;
@@ -605,6 +700,19 @@ select {
 
   .quick-find-links {
     grid-template-columns: 1fr;
+  }
+
+  .compass-focus-grid,
+  .schedule-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-header {
+    display: grid;
+  }
+
+  .schedule-source-note {
+    text-align: left;
   }
 
   .dashboard-grid {
