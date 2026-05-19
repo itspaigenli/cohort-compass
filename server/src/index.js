@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { checkDatabaseConnection } from "./config/db.js";
+import curriculumRoutes from "./routes/curriculumRoutes.js";
 import faqRoutes from "./routes/faqRoutes.js";
 import linksRoutes from "./routes/linksRoutes.js";
 import remindersRoutes from "./routes/remindersRoutes.js";
@@ -24,6 +25,7 @@ app.use("/api/faq", faqRoutes);
 app.use("/api/links", linksRoutes);
 app.use("/api/reminders", remindersRoutes);
 app.use("/api/schedule", scheduleRoutes);
+app.use("/api/curriculum", curriculumRoutes);
 
 app.get("/api/search", async (req, res) => {
   try {
