@@ -23,6 +23,7 @@ Cohort Compass is a PERN student hub for Techtonica participants. It helps stude
 - Schedule items connected to the monthly calendar and schedule preview, with optional Google Calendar source and database schedule data
 - Techtonica curriculum references loaded from the GitHub repo tree
 - compass-content markdown documents loaded from local content files when available
+- Date and time helpers handled with `date-fns` and `date-fns-tz`
 - Frontend and backend tests for key MVP behavior
 
 ## Tech Stack
@@ -32,8 +33,11 @@ Cohort Compass is a PERN student hub for Techtonica participants. It helps stude
 - React
 - Node.js
 - Vite
+- date-fns and date-fns-tz
 - Vitest
 - React Testing Library
+- Supertest
+- Font Awesome
 
 ## Project Structure
 
@@ -44,7 +48,7 @@ cohort-compass/
 │       ├── components/  # Dashboard feature components
 │       ├── pages/       # Dashboard, search, and FAQ pages
 │       ├── services/    # API helper functions
-│       ├── data/        # Curated frontend resource data
+│       ├── data/        # Suggested video resources
 │       └── utils/       # Date/time and search helpers
 ├── server/              # Express backend
 │   └── src/
@@ -54,8 +58,18 @@ cohort-compass/
 │       ├── lib/         # External data helpers
 │       ├── models/      # Data access functions
 │       └── routes/      # Express routers
-└── shared/              # Shared search planning files
+└── shared/              # Shared search helper files
 ```
+
+## Images
+
+The app currently uses one checked-in image asset as the hero background on the dashboard, search, and FAQ pages.
+
+![Cohort Compass hero background](client/src/assets/techtonica-hero-perplexity-cat.png)
+
+- Image file: `client/src/assets/techtonica-hero-perplexity-cat.png`
+- Image size: 1536 x 1024
+- Used in: `DashboardPage.jsx`, `SearchPage.jsx`, and `FAQPage.jsx`
 
 ## Local Setup
 
@@ -100,15 +114,25 @@ GOOGLE_API_KEY=
 GOOGLE_CALENDAR_TIMEZONE=America/Los_Angeles
 GOOGLE_CALENDAR_LOOKAHEAD_DAYS=30
 GOOGLE_CALENDAR_MAX_RESULTS=100
-COMPASS_CONTENT_PATH=/Users/yourusername/Desktop/GitHub/compass-content
-COMPASS_CONTENT_REPO_BASE=https://github.com/itspaigenli/compass-content/blob/main
 ```
 
 Google Calendar values are optional for local development. If they are not set,
 the schedule uses the PostgreSQL `schedule_items` data.
 
-The compass-content values are optional. If the local content repository is not
-available, the content endpoint returns an empty list instead of breaking the app.
+The compass-content values are also optional and can be added to `server/.env`
+when you have the local content repository:
+
+```text
+COMPASS_CONTENT_PATH=/Users/yourusername/Desktop/GitHub/compass-content
+COMPASS_CONTENT_REPO_BASE=https://github.com/itspaigenli/compass-content/blob/main
+```
+
+If the local content repository is not available, the content endpoint returns
+an empty list instead of breaking the app. No fake content documents are used.
+
+Data comes from the database, Google Calendar when configured, Techtonica
+curriculum references, compass-content files, and the small curated video list
+in `client/src/data/videoResources.js`. No fake app data is used.
 
 Create and seed the local PostgreSQL database using the SQL files in `server/src/db/`:
 
@@ -166,18 +190,17 @@ cd server
 npm test
 ```
 
-Current verified test status after MVP merge:
+Current verified test status:
 
-- Client: 10 test files, 29 tests passing
-- Server: 5 test files, 16 tests passing
+- Client: 17 test files, 44 tests passing
+- Server: 12 test files, 32 tests passing
 
 ## Current MVP Status
 
 The MVP is demoable with the main student-support flow in place: dashboard, search, FAQ, reminders, schedule preview, a monthly calendar, Google Calendar-backed schedule support, curriculum references, compass-content document search, and suggested video resources.
 
-Known remaining polish:
+Optional future polish:
 
 - Reminders are not shown on the calendar yet.
-- README and demo polish should be reviewed before final submission.
 - Accessibility and responsive layout should receive a final pass.
 - Final deployed links should be checked after merging to `main`.
