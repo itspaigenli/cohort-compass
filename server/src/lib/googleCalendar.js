@@ -1,12 +1,19 @@
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
+
 const GOOGLE_CALENDAR_API_BASE = "https://www.googleapis.com/calendar/v3/calendars";
+const DEFAULT_TIME_ZONE = "America/Los_Angeles";
 
-function getLookaheadEndTime() {
+function getTimeZone() {
+  return process.env.GOOGLE_CALENDAR_TIMEZONE || DEFAULT_TIME_ZONE;
+}
+
+function getLookaheadEndTime(timeZone) {
   const lookaheadDays = Number(process.env.GOOGLE_CALENDAR_LOOKAHEAD_DAYS || "30");
-  const endTime = new Date();
+  const zonedEndTime = toZonedTime(new Date(), timeZone);
 
-  endTime.setDate(endTime.getDate() + lookaheadDays);
+  zonedEndTime.setDate(zonedEndTime.getDate() + lookaheadDays);
 
-  return endTime.toISOString();
+  return fromZonedTime(zonedEndTime, timeZone).toISOString();
 }
 
 function getMaxResults() {
@@ -39,6 +46,7 @@ export function formatCalendarEvent(event) {
 
 export async function getGoogleCalendarScheduleItems() {
   const { calendarId, apiKey } = getCalendarConfig();
+  const timeZone = getTimeZone();
 
   if (!calendarId || !apiKey) {
     return null;
@@ -50,10 +58,11 @@ export async function getGoogleCalendarScheduleItems() {
 
   url.searchParams.set("key", apiKey);
   url.searchParams.set("timeMin", new Date().toISOString());
-  url.searchParams.set("timeMax", getLookaheadEndTime());
+  url.searchParams.set("timeMax", getLookaheadEndTime(timeZone));
   url.searchParams.set("maxResults", getMaxResults());
   url.searchParams.set("singleEvents", "true");
   url.searchParams.set("orderBy", "startTime");
+  url.searchParams.set("timeZone", timeZone);
 
   const response = await fetch(url);
 

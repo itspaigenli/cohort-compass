@@ -9,6 +9,7 @@ describe("googleCalendar", () => {
     vi.restoreAllMocks();
     delete process.env.GOOGLE_CALENDAR_ID;
     delete process.env.GOOGLE_API_KEY;
+    delete process.env.GOOGLE_CALENDAR_TIMEZONE;
     delete process.env.GOOGLE_CALENDAR_LOOKAHEAD_DAYS;
     delete process.env.GOOGLE_CALENDAR_MAX_RESULTS;
   });
@@ -110,5 +111,29 @@ describe("googleCalendar", () => {
     expect(requestUrl.searchParams.get("maxResults")).toBe("25");
     expect(requestUrl.searchParams.get("timeMin")).toBeTruthy();
     expect(requestUrl.searchParams.get("timeMax")).toBeTruthy();
+  });
+
+  it("sends the configured calendar timezone with the request", async () => {
+    // Arrange
+    process.env.GOOGLE_CALENDAR_ID = "calendar@example.com";
+    process.env.GOOGLE_API_KEY = "test-api-key";
+    process.env.GOOGLE_CALENDAR_TIMEZONE = "America/Los_Angeles";
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ items: [] }),
+    });
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    // Act
+    await getGoogleCalendarScheduleItems();
+
+    // Assert
+    const requestUrl = new URL(fetchMock.mock.calls[0][0]);
+
+    expect(requestUrl.searchParams.get("timeZone")).toBe(
+      "America/Los_Angeles",
+    );
   });
 });
