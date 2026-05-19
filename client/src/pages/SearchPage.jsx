@@ -1,6 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import heroBackground from "../assets/techtonica-hero-perplexity-cat.png";
 import SearchResultsSection from "../components/search/SearchResultsSection.jsx";
+import HeroSearchSection from "../components/shared/HeroSearchSection.jsx";
 import { getSuggestedVideos } from "../utils/videoSuggestions.js";
+
+const searchSections = [
+  { key: "videos", label: "Videos", id: "search-videos" },
+  { key: "links", label: "Links", id: "search-links" },
+  { key: "curriculumReferences", label: "Curriculum", id: "search-curriculum" },
+  { key: "contentDocuments", label: "Docs", id: "search-docs" },
+  { key: "faqEntries", label: "FAQ", id: "search-faq" },
+];
 
 function openResultUrl(url) {
   if (!url) {
@@ -115,10 +125,9 @@ export default function SearchPage({
   },
   onSearch,
 }) {
-  const [searchTerm, setSearchTerm] = useState(query);
-  const [status, setStatus] = useState("idle");
-  const [errorMessage, setErrorMessage] = useState("");
-  const suggestedVideos = getSuggestedVideos(query);
+  const [searchQuery, setSearchQuery] = useState(query);
+  const hasQuery = query.trim().length > 0;
+  const suggestedVideos = hasQuery ? getSuggestedVideos(query) : [];
   const totalResults =
     suggestedVideos.length +
     results.links.length +
@@ -126,65 +135,80 @@ export default function SearchPage({
     results.curriculumReferences.length +
     results.contentDocuments.length;
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+  useEffect(() => {
+    setSearchQuery(query);
+  }, [query]);
 
-    const trimmedSearchTerm = searchTerm.trim();
+  function handleSearch(nextQuery) {
+    const trimmedQuery = nextQuery.trim();
 
-    if (!trimmedSearchTerm) {
+    if (!trimmedQuery) {
       return;
     }
 
-    setStatus("loading");
-    setErrorMessage("");
+    onSearch?.(trimmedQuery);
+  }
 
-    try {
-      await onSearch?.(trimmedSearchTerm);
-      setStatus("success");
-    } catch (error) {
-      setErrorMessage(error.message);
-      setStatus("error");
+  function scrollToResultsSection(sectionId) {
+    const section = document.getElementById(sectionId);
+
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
 
   return (
-    <section className="search-page" aria-labelledby="search-page-heading">
-      <p className="eyebrow">Student search</p>
-      <h1 id="search-page-heading">Search the Student Hub</h1>
-      <p>
-        Search links and debugging FAQ entries from one place, then open the
-        result that matches what you need.
-      </p>
-      <a href="#dashboard">Back to dashboard</a>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="student-hub-search">Search the student hub</label>
-        <input
-          id="student-hub-search"
-          type="search"
-          value={searchTerm}
-          onChange={(event) => setSearchTerm(event.target.value)}
-        />
-        <button type="submit">Search</button>
-      </form>
-      {query ? (
-        <>
-          <div className="search-results-summary" aria-label="Search summary">
-            <span className="status-pill">You searched for {query}</span>
-            <span className="status-pill">{totalResults} total matches</span>
-            <span className="status-pill">{results.links.length} links</span>
-            <span className="status-pill">{results.faqEntries.length} FAQ</span>
-            <span className="status-pill">
-              {results.curriculumReferences.length} curriculum
-            </span>
-            <span className="status-pill">
-              {results.contentDocuments.length} docs
-            </span>
-            <span className="status-pill">{suggestedVideos.length} videos</span>
+    <div className="page-stack compass-home search-page">
+      <HeroSearchSection
+        title="Search the Student Hub"
+        query={searchQuery}
+        onQueryChange={setSearchQuery}
+        onSearch={handleSearch}
+        backgroundSrc={heroBackground}
+        buttonLabel="Search"
+        secondaryActionLabel="Back to dashboard"
+        secondaryActionHref="#dashboard"
+      />
+
+      <section
+        className="compass-calendar-band search-results-band"
+        aria-labelledby="search-results-heading"
+      >
+        <div className="panel-header">
+          <div>
+            <p className="item-meta">Search results</p>
+            <h2 id="search-results-heading">
+              {hasQuery ? `Results for ${query}` : "Results will appear here"}
+            </h2>
           </div>
-          {status === "loading" ? <p>Loading search results...</p> : null}
-          {status === "error" ? <p>{errorMessage}</p> : null}
-          {status !== "loading" && status !== "error" ? (
-            <div className="search-results-grid">
+          {hasQuery ? (
+            <span className="status-pill">{totalResults} total matches</span>
+          ) : null}
+        </div>
+
+        {hasQuery ? (
+          <>
+            <div className="search-results-summary" aria-label="Search summary">
+              {searchSections.map((section) => {
+                const sectionCount =
+                  section.key === "videos"
+                    ? suggestedVideos.length
+                    : results[section.key].length;
+
+                return (
+                  <button
+                    key={section.key}
+                    className="search-summary-link"
+                    type="button"
+                    onClick={() => scrollToResultsSection(section.id)}
+                  >
+                    {section.label}: {sectionCount}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="search-grid">
               <SearchResultsSection
                 id="search-videos"
                 title="Suggested Videos"
@@ -206,27 +230,33 @@ export default function SearchPage({
                 emptyLabel="No curriculum references matched your search."
                 renderItem={renderCurriculumResult}
               />
-              <SearchResultsSection
-                id="search-docs"
-                title="Compass Content Docs"
-                items={results.contentDocuments}
-                emptyLabel="No compass content docs matched your search."
-                renderItem={renderContentDocumentResult}
-              />
-              <SearchResultsSection
-                id="search-faq"
-                title="Debugging FAQ"
-                items={results.faqEntries}
-                emptyLabel="No FAQ entries matched your search."
-                renderItem={renderFaqResult}
-              />
+              <div className="search-column-stack">
+                <SearchResultsSection
+                  id="search-docs"
+                  title="Compass Content Docs"
+                  items={results.contentDocuments}
+                  emptyLabel="No compass content docs matched your search."
+                  renderItem={renderContentDocumentResult}
+                />
+                <SearchResultsSection
+                  id="search-faq"
+                  title="Debugging FAQ"
+                  items={results.faqEntries}
+                  emptyLabel="No FAQ entries matched your search."
+                  renderItem={renderFaqResult}
+                />
+              </div>
             </div>
-          ) : null}
-          {status !== "loading" && status !== "error" && totalResults === 0 ? (
-            <p>No results found for {query}</p>
-          ) : null}
-        </>
-      ) : null}
-    </section>
+
+            {totalResults === 0 ? <p>No results found for {query}</p> : null}
+          </>
+        ) : (
+          <p className="empty-state">
+            Enter a topic above to search links, curriculum, docs, FAQ entries,
+            and suggested videos.
+          </p>
+        )}
+      </section>
+    </div>
   );
 }

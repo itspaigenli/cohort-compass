@@ -23,7 +23,9 @@ describe("SearchPage", () => {
 
     // Act
     fireEvent.change(
-      screen.getByRole("searchbox", { name: /search the student hub/i }),
+      screen.getByRole("searchbox", {
+        name: /search docs, tools, debugging help, or a topic/i,
+      }),
       {
         target: { value: "react hooks" },
       },
@@ -60,12 +62,8 @@ describe("SearchPage", () => {
       />,
     );
 
-    const linksGroup = screen.getByRole("region", {
-      name: /links/i,
-    });
-    const faqGroup = screen.getByRole("region", {
-      name: /faq/i,
-    });
+    const linksGroup = screen.getByRole("region", { name: /links/i });
+    const faqGroup = screen.getByRole("region", { name: /debugging faq/i });
 
     // Assert
     expect(
