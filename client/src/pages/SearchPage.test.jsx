@@ -1,17 +1,8 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import SearchPage from "./SearchPage.jsx";
-import { searchStudentHub } from "../services/searchApi.js";
-
-vi.mock("../services/searchApi.js", () => ({
-  searchStudentHub: vi.fn(),
-}));
 
 describe("SearchPage", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it("renders the search page shell", () => {
     // Arrange
     render(<SearchPage />);
@@ -27,11 +18,8 @@ describe("SearchPage", () => {
 
   it("lets a student type and submit a search term", async () => {
     // Arrange
-    searchStudentHub.mockResolvedValue({
-      links: [],
-      faqEntries: [],
-    });
-    render(<SearchPage />);
+    const handleSearch = vi.fn().mockResolvedValue();
+    render(<SearchPage onSearch={handleSearch} />);
 
     // Act
     fireEvent.change(
@@ -43,42 +31,36 @@ describe("SearchPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /search/i }));
 
     // Assert
-    expect(
-      await screen.findByText(/you searched for react hooks/i),
-    ).toBeInTheDocument();
-    expect(searchStudentHub).toHaveBeenCalledWith("react hooks");
+    expect(handleSearch).toHaveBeenCalledWith("react hooks");
   });
 
-  it("shows matching search results in clear groups", async () => {
+  it("shows matching search results in clear groups", () => {
     // Arrange
-    searchStudentHub.mockResolvedValue({
-      links: [
-        {
-          id: 1,
-          title: "React Documentation",
-          description: "Official React documentation for components and hooks.",
-        },
-      ],
-      faqEntries: [
-        {
-          id: 2,
-          question: "Why is my useEffect running twice?",
-          answer: "React Strict Mode may run effects more than once.",
-        },
-      ],
-    });
-    render(<SearchPage />);
-
-    // Act
-    fireEvent.change(
-      screen.getByRole("searchbox", { name: /search the student hub/i }),
-      {
-        target: { value: "react" },
-      },
+    render(
+      <SearchPage
+        query="react"
+        results={{
+          links: [
+            {
+              id: 1,
+              title: "React Documentation",
+              description: "Official React documentation for components and hooks.",
+            },
+          ],
+          faqEntries: [
+            {
+              id: 2,
+              question: "Why is my useEffect running twice?",
+              answer: "React Strict Mode may run effects more than once.",
+            },
+          ],
+          curriculumReferences: [],
+          contentDocuments: [],
+        }}
+      />,
     );
-    fireEvent.click(screen.getByRole("button", { name: /search/i }));
 
-    const linksGroup = await screen.findByRole("region", {
+    const linksGroup = screen.getByRole("region", {
       name: /links/i,
     });
     const faqGroup = screen.getByRole("region", {
@@ -96,26 +78,23 @@ describe("SearchPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows a friendly empty state when there are no search matches", async () => {
+  it("shows a friendly empty state when there are no search matches", () => {
     // Arrange
-    searchStudentHub.mockResolvedValue({
-      links: [],
-      faqEntries: [],
-    });
-    render(<SearchPage />);
-
-    // Act
-    fireEvent.change(
-      screen.getByRole("searchbox", { name: /search the student hub/i }),
-      {
-        target: { value: "database" },
-      },
+    render(
+      <SearchPage
+        query="database"
+        results={{
+          links: [],
+          faqEntries: [],
+          curriculumReferences: [],
+          contentDocuments: [],
+        }}
+      />,
     );
-    fireEvent.click(screen.getByRole("button", { name: /search/i }));
 
     // Assert
     expect(
-      await screen.findByText(/no results found for database/i),
+      screen.getByText(/no results found for database/i),
     ).toBeInTheDocument();
   });
 });

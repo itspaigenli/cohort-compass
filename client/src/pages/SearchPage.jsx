@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SearchResultsSection from "../components/search/SearchResultsSection.jsx";
-import { searchStudentHub } from "../services/searchApi.js";
 import { getSuggestedVideos } from "../utils/videoSuggestions.js";
 
 function openResultUrl(url) {
@@ -106,20 +105,20 @@ function renderContentDocumentResult(document) {
   );
 }
 
-export default function SearchPage() {
-  const [searchTerm, setSearchTerm] = useState(() => {
-    return sessionStorage.getItem("cohort-compass-search-query") || "";
-  });
-  const [submittedSearchTerm, setSubmittedSearchTerm] = useState("");
-  const [results, setResults] = useState({
+export default function SearchPage({
+  query = "",
+  results = {
     links: [],
     faqEntries: [],
     curriculumReferences: [],
     contentDocuments: [],
-  });
+  },
+  onSearch,
+}) {
+  const [searchTerm, setSearchTerm] = useState(query);
   const [status, setStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const suggestedVideos = getSuggestedVideos(submittedSearchTerm);
+  const suggestedVideos = getSuggestedVideos(query);
   const totalResults =
     suggestedVideos.length +
     results.links.length +
@@ -127,62 +126,26 @@ export default function SearchPage() {
     results.curriculumReferences.length +
     results.contentDocuments.length;
 
-  async function runSearch(trimmedSearchTerm) {
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    const trimmedSearchTerm = searchTerm.trim();
+
     if (!trimmedSearchTerm) {
-      setSubmittedSearchTerm("");
-      setResults({
-        links: [],
-        faqEntries: [],
-        curriculumReferences: [],
-        contentDocuments: [],
-      });
-      setStatus("idle");
       return;
     }
 
-    setSubmittedSearchTerm(trimmedSearchTerm);
     setStatus("loading");
     setErrorMessage("");
 
     try {
-      const searchResults = await searchStudentHub(trimmedSearchTerm);
-
-      setResults({
-        links: searchResults.links || [],
-        faqEntries: searchResults.faqEntries || [],
-        curriculumReferences: searchResults.curriculumReferences || [],
-        contentDocuments: searchResults.contentDocuments || [],
-      });
+      await onSearch?.(trimmedSearchTerm);
       setStatus("success");
     } catch (error) {
       setErrorMessage(error.message);
-      setResults({
-        links: [],
-        faqEntries: [],
-        curriculumReferences: [],
-        contentDocuments: [],
-      });
       setStatus("error");
     }
   }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    await runSearch(searchTerm.trim());
-  }
-
-  useEffect(() => {
-    const savedSearchQuery = sessionStorage.getItem(
-      "cohort-compass-search-query",
-    );
-
-    if (!savedSearchQuery) {
-      return;
-    }
-
-    sessionStorage.removeItem("cohort-compass-search-query");
-    runSearch(savedSearchQuery.trim());
-  }, []);
 
   return (
     <section className="search-page" aria-labelledby="search-page-heading">
@@ -203,10 +166,10 @@ export default function SearchPage() {
         />
         <button type="submit">Search</button>
       </form>
-      {submittedSearchTerm ? (
+      {query ? (
         <>
           <div className="search-results-summary" aria-label="Search summary">
-            <span className="status-pill">You searched for {submittedSearchTerm}</span>
+            <span className="status-pill">You searched for {query}</span>
             <span className="status-pill">{totalResults} total matches</span>
             <span className="status-pill">{results.links.length} links</span>
             <span className="status-pill">{results.faqEntries.length} FAQ</span>
@@ -220,7 +183,7 @@ export default function SearchPage() {
           </div>
           {status === "loading" ? <p>Loading search results...</p> : null}
           {status === "error" ? <p>{errorMessage}</p> : null}
-          {status === "success" ? (
+          {status !== "loading" && status !== "error" ? (
             <div className="search-results-grid">
               <SearchResultsSection
                 id="search-videos"
@@ -259,8 +222,8 @@ export default function SearchPage() {
               />
             </div>
           ) : null}
-          {status === "success" && totalResults === 0 ? (
-            <p>No results found for {submittedSearchTerm}</p>
+          {status !== "loading" && status !== "error" && totalResults === 0 ? (
+            <p>No results found for {query}</p>
           ) : null}
         </>
       ) : null}
