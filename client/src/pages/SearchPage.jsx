@@ -1,38 +1,66 @@
 import { useState } from "react";
+import SearchResultsSection from "../components/search/SearchResultsSection.jsx";
 import { searchStudentHub } from "../services/searchApi.js";
 
-function buildSearchGroups(results) {
-  const groups = [];
-
-  if (results.links?.length) {
-    groups.push({
-      title: "Links",
-      items: results.links.map((link) => ({
-        title: link.title,
-        description: link.description,
-      })),
-    });
+function openResultUrl(url) {
+  if (!url) {
+    return;
   }
 
-  if (results.faqEntries?.length) {
-    groups.push({
-      title: "FAQ",
-      items: results.faqEntries.map((entry) => ({
-        title: entry.question,
-        description: entry.answer,
-      })),
-    });
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function handleResultKeyDown(event, url) {
+  if (event.key !== "Enter" && event.key !== " ") {
+    return;
   }
 
-  return groups;
+  event.preventDefault();
+  openResultUrl(url);
+}
+
+function renderLinkResult(link) {
+  return (
+    <article
+      key={link.id}
+      className="search-result-card search-result-card-clickable"
+      role="link"
+      tabIndex={0}
+      onClick={() => openResultUrl(link.url)}
+      onKeyDown={(event) => handleResultKeyDown(event, link.url)}
+    >
+      <p className="item-meta">{link.category}</p>
+      <h3>{link.title}</h3>
+      <p>{link.description}</p>
+      <span className="search-result-link-label">Open link</span>
+    </article>
+  );
+}
+
+function renderFaqResult(entry) {
+  return (
+    <article key={entry.id} className="search-result-card">
+      <p className="item-meta">{entry.category}</p>
+      <h3>{entry.question}</h3>
+      <p>{entry.answer}</p>
+      {entry.error_topic ? (
+        <span className="tag-chip">{entry.error_topic}</span>
+      ) : null}
+      <a href="#faq">Browse full FAQ</a>
+    </article>
+  );
 }
 
 export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedSearchTerm, setSubmittedSearchTerm] = useState("");
-  const [matchingGroups, setMatchingGroups] = useState([]);
+  const [results, setResults] = useState({
+    links: [],
+    faqEntries: [],
+  });
   const [status, setStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const totalResults = results.links.length + results.faqEntries.length;
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -41,7 +69,7 @@ export default function SearchPage() {
 
     if (!trimmedSearchTerm) {
       setSubmittedSearchTerm("");
-      setMatchingGroups([]);
+      setResults({ links: [], faqEntries: [] });
       setStatus("idle");
       return;
     }
@@ -51,13 +79,16 @@ export default function SearchPage() {
     setErrorMessage("");
 
     try {
-      const results = await searchStudentHub(trimmedSearchTerm);
+      const searchResults = await searchStudentHub(trimmedSearchTerm);
 
-      setMatchingGroups(buildSearchGroups(results));
+      setResults({
+        links: searchResults.links || [],
+        faqEntries: searchResults.faqEntries || [],
+      });
       setStatus("success");
     } catch (error) {
       setErrorMessage(error.message);
-      setMatchingGroups([]);
+      setResults({ links: [], faqEntries: [] });
       setStatus("error");
     }
   }
@@ -78,31 +109,33 @@ export default function SearchPage() {
       </form>
       {submittedSearchTerm ? (
         <>
-          <p>You searched for {submittedSearchTerm}</p>
+          <div className="search-results-summary" aria-label="Search summary">
+            <span className="status-pill">You searched for {submittedSearchTerm}</span>
+            <span className="status-pill">{totalResults} total matches</span>
+            <span className="status-pill">{results.links.length} links</span>
+            <span className="status-pill">{results.faqEntries.length} FAQ</span>
+          </div>
           {status === "loading" ? <p>Loading search results...</p> : null}
           {status === "error" ? <p>{errorMessage}</p> : null}
-          {status === "success" && matchingGroups.length > 0 ? (
-            <div>
-              {matchingGroups.map((group) => {
-                const headingId = `${group.title.toLowerCase()}-results-heading`;
-
-                return (
-                  <section key={group.title} aria-labelledby={headingId}>
-                    <h2 id={headingId}>{group.title}</h2>
-                    <ul>
-                      {group.items.map((item) => (
-                        <li key={item.title}>
-                          <h3>{item.title}</h3>
-                          <p>{item.description}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                );
-              })}
+          {status === "success" ? (
+            <div className="search-results-grid">
+              <SearchResultsSection
+                id="search-links"
+                title="Links"
+                items={results.links}
+                emptyLabel="No links matched your search."
+                renderItem={renderLinkResult}
+              />
+              <SearchResultsSection
+                id="search-faq"
+                title="Debugging FAQ"
+                items={results.faqEntries}
+                emptyLabel="No FAQ entries matched your search."
+                renderItem={renderFaqResult}
+              />
             </div>
           ) : null}
-          {status === "success" && matchingGroups.length === 0 ? (
+          {status === "success" && totalResults === 0 ? (
             <p>No results found for {submittedSearchTerm}</p>
           ) : null}
         </>
