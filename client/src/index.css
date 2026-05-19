@@ -35,15 +35,26 @@ select {
 }
 
 .app-shell {
-  width: min(1040px, calc(100vw - 2rem));
+  width: min(1120px, calc(100vw - 2rem));
   margin: 0 auto;
   padding: 3rem 0;
+}
+
+.dashboard-page {
+  display: grid;
+  gap: 1.25rem;
 }
 
 .hero {
   display: grid;
   gap: 0.85rem;
   padding: 3rem 0 2rem;
+}
+
+.dashboard-hero {
+  min-height: 22rem;
+  align-content: center;
+  border-bottom: 1px solid rgba(0, 147, 181, 0.14);
 }
 
 .eyebrow {
@@ -69,6 +80,40 @@ select {
   color: rgba(23, 49, 58, 0.76);
   font-size: 1.12rem;
   line-height: 1.6;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.primary-action,
+.secondary-action {
+  border: 1px solid rgba(0, 147, 181, 0.22);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.primary-action {
+  color: #ffffff;
+  background: #05556d;
+}
+
+.secondary-action {
+  color: #05556d;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.primary-action:hover,
+.primary-action:focus,
+.secondary-action:hover,
+.secondary-action:focus {
+  border-color: rgba(252, 118, 37, 0.55);
+  outline: none;
 }
 
 .section-nav {
@@ -113,7 +158,7 @@ select {
 
 .quick-find-links {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.75rem;
 }
 
@@ -148,6 +193,23 @@ select {
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.84);
   box-shadow: 0 18px 42px rgba(5, 85, 109, 0.09);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.dashboard-grid .schedule-section,
+.dashboard-grid .links-section,
+.dashboard-grid .faq-section,
+.dashboard-grid .reminders-section {
+  margin-top: 0;
+}
+
+.dashboard-section-wide {
+  grid-column: 1 / -1;
 }
 
 .schedule-section h2,
@@ -299,6 +361,20 @@ select {
   gap: 1.25rem;
 }
 
+.search-page > p {
+  max-width: 720px;
+  margin: 0;
+  color: rgba(23, 49, 58, 0.76);
+  line-height: 1.6;
+}
+
+.search-page > a {
+  width: fit-content;
+  color: #05556d;
+  font-weight: 800;
+  text-decoration-color: rgba(252, 118, 37, 0.5);
+}
+
 .search-page form {
   display: grid;
   gap: 0.65rem;
@@ -397,6 +473,10 @@ select {
   background: #ffffff;
 }
 
+.search-result-card .tag-chip {
+  margin-top: 0.1rem;
+}
+
 .search-result-card-clickable {
   cursor: pointer;
 }
@@ -461,6 +541,10 @@ select {
   }
 
   .quick-find-links {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-grid {
     grid-template-columns: 1fr;
   }
 
