@@ -108,6 +108,7 @@ The server expects:
 
 ```text
 DATABASE_URL=postgresql://yourusername@localhost:5432/cohort-compass-db
+DATABASE_SSL=false
 PORT=3000
 CLIENT_ORIGIN=http://localhost:5173
 GOOGLE_CALENDAR_ID=
@@ -206,6 +207,7 @@ npm start --prefix server
 
 ```text
 DATABASE_URL=your-production-postgres-url
+DATABASE_SSL=true
 PORT=provided-by-render
 GOOGLE_CALENDAR_ID=
 GOOGLE_API_KEY=
