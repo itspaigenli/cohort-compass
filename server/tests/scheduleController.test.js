@@ -53,6 +53,29 @@ describe("listSchedule", () => {
     expect(listScheduleItems).not.toHaveBeenCalled();
   });
 
+  it("passes date filters to Google Calendar schedule loading", async () => {
+    // Arrange
+    const response = createResponseMock();
+    const calendarItems = [
+      {
+        id: "event-1",
+        title: "Office Hours",
+        start_time: "2026-05-20T18:00:00-07:00",
+      },
+    ];
+
+    getGoogleCalendarScheduleItems.mockResolvedValue(calendarItems);
+
+    // Act
+    await listSchedule({ query: { date: "2026-05-20" } }, response);
+
+    // Assert
+    expect(getGoogleCalendarScheduleItems).toHaveBeenCalledWith({
+      date: "2026-05-20",
+    });
+    expect(response.body).toEqual({ scheduleItems: calendarItems });
+  });
+
   it("falls back to database schedule items when Google Calendar is unavailable", async () => {
     // Arrange
     const response = createResponseMock();
@@ -72,6 +95,28 @@ describe("listSchedule", () => {
 
     // Assert
     expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({ scheduleItems: databaseItems });
+  });
+
+  it("passes date filters to database schedule fallback loading", async () => {
+    // Arrange
+    const response = createResponseMock();
+    const databaseItems = [
+      {
+        id: 1,
+        title: "Weekly Check-In",
+        start_time: "2026-05-21T17:00:00.000Z",
+      },
+    ];
+
+    getGoogleCalendarScheduleItems.mockResolvedValue(null);
+    listScheduleItems.mockResolvedValue(databaseItems);
+
+    // Act
+    await listSchedule({ query: { date: "2026-05-21" } }, response);
+
+    // Assert
+    expect(listScheduleItems).toHaveBeenCalledWith({ date: "2026-05-21" });
     expect(response.body).toEqual({ scheduleItems: databaseItems });
   });
 });

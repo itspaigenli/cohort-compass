@@ -3,8 +3,9 @@ import { listScheduleItems } from "../models/scheduleModel.js";
 
 export async function listSchedule(req, res) {
   try {
-    const calendarScheduleItems = await getGoogleCalendarScheduleItems();
-    const scheduleItems = calendarScheduleItems || await listScheduleItems();
+    const options = { date: req.query.date };
+    const calendarScheduleItems = await getGoogleCalendarScheduleItems(options);
+    const scheduleItems = calendarScheduleItems || await listScheduleItems(options);
 
     res.json({
       scheduleItems,

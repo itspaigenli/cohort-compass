@@ -136,4 +136,32 @@ describe("googleCalendar", () => {
       "America/Los_Angeles",
     );
   });
+
+  it("requests a specific calendar day when a date is provided", async () => {
+    // Arrange
+    process.env.GOOGLE_CALENDAR_ID = "calendar@example.com";
+    process.env.GOOGLE_API_KEY = "test-api-key";
+    process.env.GOOGLE_CALENDAR_TIMEZONE = "America/Los_Angeles";
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ items: [] }),
+    });
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    // Act
+    await getGoogleCalendarScheduleItems({ date: "2026-05-20" });
+
+    // Assert
+    const requestUrl = new URL(fetchMock.mock.calls[0][0]);
+
+    expect(requestUrl.searchParams.get("timeMin")).toBe(
+      "2026-05-20T07:00:00.000Z",
+    );
+    expect(requestUrl.searchParams.get("timeMax")).toBe(
+      "2026-05-21T06:59:59.000Z",
+    );
+    expect(requestUrl.searchParams.get("maxResults")).toBe("25");
+  });
 });

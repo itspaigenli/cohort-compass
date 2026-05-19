@@ -8,7 +8,7 @@ import faqRoutes from "./routes/faqRoutes.js";
 import linksRoutes from "./routes/linksRoutes.js";
 import remindersRoutes from "./routes/remindersRoutes.js";
 import scheduleRoutes from "./routes/scheduleRoutes.js";
-import { searchLinksAndFaq } from "./models/searchModel.js";
+import searchRoutes from "./routes/search.js";
 
 dotenv.config();
 
@@ -41,19 +41,7 @@ app.use("/api/reminders", remindersRoutes);
 app.use("/api/schedule", scheduleRoutes);
 app.use("/api/curriculum", curriculumRoutes);
 app.use("/api/content", contentRoutes);
-
-app.get("/api/search", async (req, res) => {
-  try {
-    const searchTerm = req.query.q || "";
-    const results = await searchLinksAndFaq(searchTerm);
-
-    res.json(results);
-  } catch (error) {
-    console.error("Error searching Cohort Compass content:", error);
-
-    res.status(500).json({ error: "Unable to search Cohort Compass content." });
-  }
-});
+app.use("/api/search", searchRoutes);
 
 app.get("/", async (req, res) => {
   const databaseConnected = await checkDatabaseConnection();

@@ -1,10 +1,29 @@
-import { fromZonedTime, toZonedTime } from "date-fns-tz";
+import { formatInTimeZone, fromZonedTime, toZonedTime } from "date-fns-tz";
 
 const GOOGLE_CALENDAR_API_BASE = "https://www.googleapis.com/calendar/v3/calendars";
 const DEFAULT_TIME_ZONE = "America/Los_Angeles";
 
 function getTimeZone() {
   return process.env.GOOGLE_CALENDAR_TIMEZONE || DEFAULT_TIME_ZONE;
+}
+
+function getDayRange(dateValue, timeZone = DEFAULT_TIME_ZONE) {
+  const baseDate = typeof dateValue === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)
+    ? new Date(`${dateValue}T12:00:00Z`)
+    : new Date(dateValue);
+
+  if (Number.isNaN(baseDate.getTime())) {
+    return null;
+  }
+
+  const dayString = typeof dateValue === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)
+    ? dateValue
+    : formatInTimeZone(baseDate, timeZone, "yyyy-MM-dd");
+
+  return {
+    timeMin: fromZonedTime(`${dayString}T00:00:00`, timeZone).toISOString(),
+    timeMax: fromZonedTime(`${dayString}T23:59:59`, timeZone).toISOString(),
+  };
 }
 
 function getLookaheadEndTime(timeZone) {
@@ -44,7 +63,7 @@ export function formatCalendarEvent(event) {
   };
 }
 
-export async function getGoogleCalendarScheduleItems() {
+export async function getGoogleCalendarScheduleItems(options = {}) {
   const { calendarId, apiKey } = getCalendarConfig();
   const timeZone = getTimeZone();
 
@@ -56,10 +75,12 @@ export async function getGoogleCalendarScheduleItems() {
     `${GOOGLE_CALENDAR_API_BASE}/${encodeURIComponent(calendarId)}/events`,
   );
 
+  const dayRange = options.date ? getDayRange(options.date, timeZone) : null;
+
   url.searchParams.set("key", apiKey);
-  url.searchParams.set("timeMin", new Date().toISOString());
-  url.searchParams.set("timeMax", getLookaheadEndTime(timeZone));
-  url.searchParams.set("maxResults", getMaxResults());
+  url.searchParams.set("timeMin", dayRange?.timeMin || new Date().toISOString());
+  url.searchParams.set("timeMax", dayRange?.timeMax || getLookaheadEndTime(timeZone));
+  url.searchParams.set("maxResults", dayRange ? "25" : getMaxResults());
   url.searchParams.set("singleEvents", "true");
   url.searchParams.set("orderBy", "startTime");
   url.searchParams.set("timeZone", timeZone);
