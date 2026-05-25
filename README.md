@@ -7,7 +7,7 @@ Cohort Compass is a PERN student hub for Techtonica participants. It helps stude
 - Planning document: https://docs.google.com/document/d/1yWPORO5A6SUypcOhJe4VgpmYCTEtYpDQdpOa7JSdQIo/edit?usp=sharing
 - GitHub repository: https://github.com/itspaigenli/cohort-compass
 - GitHub Project board: https://github.com/users/itspaigenli/projects/1/views/1
-- Deployment target: Render web service
+- Deployment target: [Render web service](https://cohort-compass.onrender.com/)
 
 ## MVP Features
 
