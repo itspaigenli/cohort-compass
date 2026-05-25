@@ -18,7 +18,7 @@ Cohort Compass is a PERN student hub for Techtonica participants. It helps stude
 - Important links and FAQ data loaded from the backend
 - Reminder list backed by the database
 - Monthly calendar view on the dashboard
-- Schedule items connected to the monthly calendar and schedule preview, with optional Google Calendar source and database schedule data
+- Schedule items connected to the monthly calendar and schedule preview, with Google Calendar source
 - Techtonica curriculum references loaded from the GitHub repo tree
 - compass-content markdown documents loaded from local content files when available
 - Date and time helpers handled with `date-fns` and `date-fns-tz`
