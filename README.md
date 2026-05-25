@@ -182,13 +182,11 @@ Local URLs:
 
 ## Production Setup
 
-Cohort Compass is deployed on Render with separate frontend and backend services.
+Cohort Compass is deployed on Render as a single production app.
 
-Deployed URLs:
+Deployed app:
 
-- Frontend: https://cohortcompass.onrender.com
-- Backend: https://cohort-compass-1.onrender.com
-- Backend API base: https://cohort-compass-1.onrender.com/api
+- https://cohort-compass.onrender.com/
 
 Build the frontend:
 
@@ -197,22 +195,22 @@ cd client
 npm run build
 ```
 
-Start the production backend:
+Start the production server:
 
 ```bash
 cd ../server
 npm start
 ```
 
-The production backend serves:
+The production server serves:
 
+- React app from `client/dist`
 - API routes from `/api`
 - Health check from `/api/health`
 
 Render production setup:
 
-- Frontend service: https://cohortcompass.onrender.com
-- Backend service: https://cohort-compass-1.onrender.com
+- Service: https://cohort-compass.onrender.com/
 - Root directory: repository root
 - Build command:
 
@@ -226,13 +224,7 @@ npm install --prefix server && npm install --prefix client && npm run build --pr
 npm start --prefix server
 ```
 
-- Frontend production environment variables:
-
-```text
-VITE_API_URL=https://cohort-compass-1.onrender.com/api
-```
-
-- Backend production environment variables:
+- Production environment variables:
 
 ```text
 DATABASE_URL=your-production-postgres-url
@@ -245,9 +237,8 @@ GOOGLE_CALENDAR_LOOKAHEAD_DAYS=30
 GOOGLE_CALENDAR_MAX_RESULTS=100
 ```
 
-The frontend uses `VITE_API_URL` for API requests. If it is not set, the client
-falls back to same-origin `/api`, which is useful for local proxy-based
-development but does not match the separate Render frontend and backend services.
+Production does not need `VITE_API_URL` because the built frontend and API use
+the same deployed server.
 
 ## API Routes
 
