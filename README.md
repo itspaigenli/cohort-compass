@@ -69,6 +69,20 @@ The app currently uses one checked-in image asset as the hero background on the 
 - Image size: 1536 x 1024
 - Used in: `DashboardPage.jsx`, `SearchPage.jsx`, and `FAQPage.jsx`
 
+## App Screenshots
+
+Search page empty state:
+
+![Search Student Hub empty state](docs/images/search-student-hub-empty-state.png)
+
+Search page with CSS results:
+
+![Search results for CSS grouped by resource type](docs/images/search-results-css.png)
+
+Monthly calendar view:
+
+![Monthly calendar view for May 2026](docs/images/monthly-calendar-may-2026.png)
+
 ## Local Setup
 
 Clone the repository:
