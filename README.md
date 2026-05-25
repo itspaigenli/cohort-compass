@@ -7,7 +7,7 @@ Cohort Compass is a PERN student hub for Techtonica participants. It helps stude
 - Planning document: https://docs.google.com/document/d/1yWPORO5A6SUypcOhJe4VgpmYCTEtYpDQdpOa7JSdQIo/edit?usp=sharing
 - GitHub repository: https://github.com/itspaigenli/cohort-compass
 - GitHub Project board: https://github.com/users/itspaigenli/projects/1/views/1
-- Deployment target: Render web service
+- Deployment target: [Render web service](https://cohort-compass.onrender.com/)
 
 ## MVP Features
 
@@ -18,7 +18,7 @@ Cohort Compass is a PERN student hub for Techtonica participants. It helps stude
 - Important links and FAQ data loaded from the backend
 - Reminder list backed by the database
 - Monthly calendar view on the dashboard
-- Schedule items connected to the monthly calendar and schedule preview, with optional Google Calendar source and database schedule data
+- Schedule items connected to the monthly calendar and schedule preview, with Google Calendar source
 - Techtonica curriculum references loaded from the GitHub repo tree
 - compass-content markdown documents loaded from local content files when available
 - Date and time helpers handled with `date-fns` and `date-fns-tz`
@@ -64,10 +64,6 @@ cohort-compass/
 The app currently uses one checked-in image asset as the hero background on the dashboard, search, and FAQ pages.
 
 ![Cohort Compass hero background](client/src/assets/techtonica-hero-perplexity-cat.png)
-
-- Image file: `client/src/assets/techtonica-hero-perplexity-cat.png`
-- Image size: 1536 x 1024
-- Used in: `DashboardPage.jsx`, `SearchPage.jsx`, and `FAQPage.jsx`
 
 ## App Screenshots
 
