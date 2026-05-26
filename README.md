@@ -270,13 +270,3 @@ Current verified test status:
 
 - Client: 17 test files, 44 tests passing
 - Server: 13 test files, 38 tests passing
-
-## Current MVP Status
-
-The MVP is demoable with the main student-support flow in place: dashboard, search, FAQ, reminders, schedule preview, a monthly calendar, Google Calendar-backed schedule support, curriculum references, compass-content document search, and suggested video resources.
-
-Optional future polish:
-
-- Reminders are shown on the calendar and link back to the reminder list on mobile.
-- Accessibility and responsive layout should receive a final pass.
-- The deployed Render app has been verified at https://cohort-compass.onrender.com/.
