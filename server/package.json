@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
+    "build": "npm install --prefix ../client && npm run build --prefix ../client",
     "test": "vitest",
+    "db:init": "psql -d cohort-compass-db -f src/db/schema.sql && psql -d cohort-compass-db -f src/db/seed.sql",
     "db:connect": "psql -d cohort-compass-db",
     "db:check": "psql -d postgres -c \"SELECT version();\""
   },
@@ -17,6 +19,7 @@
   "dependencies": {
     "cors": "^2.8.6",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "pg": "^8.20.0"

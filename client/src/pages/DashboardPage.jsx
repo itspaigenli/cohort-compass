@@ -1,90 +1,75 @@
 import { useState } from "react";
-import FaqPreview from "../components/dashboard/FaqPreview.jsx";
-import LinksPreview from "../components/dashboard/LinksPreview.jsx";
 import MonthlyCalendar from "../components/dashboard/MonthlyCalendar.jsx";
 import RemindersPanel from "../components/dashboard/RemindersPanel.jsx";
 import SchedulePreview from "../components/dashboard/SchedulePreview.jsx";
+import HeroSearchSection from "../components/shared/HeroSearchSection.jsx";
+import heroBackground from "../assets/techtonica-hero-perplexity-cat.png";
 
-function DashboardSection({ id, className, title, children }) {
-  const headingId = `${id}-heading`;
-
-  return (
-    <section id={id} className={className} aria-labelledby={headingId}>
-      <h2 id={headingId}>{title}</h2>
-      {children}
-    </section>
-  );
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-export default function DashboardPage() {
-  const [scheduleItems, setScheduleItems] = useState([]);
+export default function DashboardPage({
+  reminders = [],
+  onRemindersChange,
+  scheduleItems,
+  onLoadScheduleItems,
+  onSearch,
+}) {
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <>
-      <header className="hero">
-        <p className="eyebrow">Student dashboard</p>
-        <h1>Cohort Compass</h1>
-        <p>
-          A simple place to check your cohort schedule, important links,
-          reminders, and class resources.
-        </p>
-      </header>
+    <div className="page-stack compass-home perplexity-inspired-home">
+      <HeroSearchSection
+        title="Cohort Compass"
+        query={searchQuery}
+        onQueryChange={setSearchQuery}
+        onSearch={onSearch}
+        backgroundSrc={heroBackground}
+        secondaryActionLabel="Open debugging FAQ"
+        secondaryActionHref="#faq"
+      />
 
-      <nav className="section-nav" aria-label="Main sections">
-        <a href="#search">Search student hub</a>
-        <a href="#schedule">Schedule</a>
-        <a href="#links">Links</a>
-        <a href="#faq">FAQ</a>
-        <a href="#reminders">Reminders</a>
-      </nav>
-
-      <section className="quick-find" aria-labelledby="quick-find-heading">
-        <p className="eyebrow">Find what you need</p>
-        <h2 id="quick-find-heading">What are you looking for?</h2>
-        <div className="quick-find-links">
-          <a href="#schedule">Today&apos;s schedule</a>
-          <a href="#links">Program links</a>
-          <a href="#faq">Debugging help</a>
-          <a href="#reminders">My reminders</a>
+      <section className="compass-focus-band">
+        <div className="compass-focus-grid">
+          <SchedulePreview
+            items={scheduleItems}
+            className="compass-snapshot-surface"
+          />
+          <RemindersPanel
+            reminders={reminders}
+            onRemindersChange={onRemindersChange}
+            className="compass-reminders-surface"
+          />
         </div>
       </section>
 
-      <DashboardSection
-        id="schedule"
-        className="schedule-section"
-        title="Upcoming Schedule"
-      >
-        <MonthlyCalendar
-          year={2026}
-          monthIndex={4}
-          scheduleItems={scheduleItems}
-        />
-        <SchedulePreview onScheduleItemsLoaded={setScheduleItems} />
-      </DashboardSection>
+      <section className="compass-calendar-band">
+        <div className="compass-calendar-band-header">
+          <div>
+            <h2>Plan your week</h2>
+          </div>
+        </div>
 
-      <DashboardSection
-        id="links"
-        className="links-section"
-        title="Important Links"
-      >
-        <LinksPreview />
-      </DashboardSection>
+        <div className="compass-calendar-grid compass-calendar-grid-full">
+          <MonthlyCalendar
+            items={scheduleItems}
+            reminders={reminders}
+            onLoadItemsForDate={onLoadScheduleItems}
+            className="compass-calendar-surface"
+            remindersHref="#dashboard-reminders"
+          />
+        </div>
+      </section>
 
-      <DashboardSection
-        id="faq"
-        className="faq-section"
-        title="Debugging FAQ"
+      <button
+        className="search-back-to-top"
+        type="button"
+        aria-label="Back to top"
+        onClick={scrollToTop}
       >
-        <FaqPreview />
-      </DashboardSection>
-
-      <DashboardSection
-        id="reminders"
-        className="reminders-section"
-        title="Reminders"
-      >
-        <RemindersPanel />
-      </DashboardSection>
-    </>
+        <i className="fa-solid fa-circle-arrow-up" aria-hidden="true" />
+      </button>
+    </div>
   );
 }

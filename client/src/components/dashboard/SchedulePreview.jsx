@@ -1,56 +1,247 @@
-import { useEffect, useState } from "react";
-import { fetchScheduleItems } from "../../services/scheduleApi.js";
+import { useEffect, useMemo, useState } from "react";
+import {
+  addDays,
+  formatDayLabel,
+  formatScheduleDateRange,
+  isSameCalendarDay,
+  normalizeScheduleItems,
+  startOfLocalDay,
+  toDateKey,
+} from "../../utils/dateTime.js";
 
-export default function SchedulePreview({ onScheduleItemsLoaded }) {
-  const [scheduleItems, setScheduleItems] = useState([]);
-  const [status, setStatus] = useState("loading");
-  const [errorMessage, setErrorMessage] = useState("");
+function getDayLabel(date = new Date()) {
+  return formatDayLabel(date);
+}
+
+function getLocationLabel(location = "") {
+  if (!location) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(location)) {
+    if (location.includes("zoom.us")) {
+      return "Zoom";
+    }
+
+    return "Virtual meeting";
+  }
+
+  return location;
+}
+
+function getPanelHeading(date, today, options = {}) {
+  if (options.mobileSingleDay) {
+    return "Day snapshot";
+  }
+
+  return "Two-day snapshot";
+}
+
+function getColumnHeading(date, today, options = {}) {
+  if (options.mobileSingleDay) {
+    if (isSameCalendarDay(date, today)) {
+      return `Today · ${getDayLabel(date)}`;
+    }
+
+    return getDayLabel(date);
+  }
+
+  if (isSameCalendarDay(date, today)) {
+    return `Today · ${getDayLabel(date)}`;
+  }
+
+  if (isSameCalendarDay(date, addDays(today, 1))) {
+    return `Tomorrow · ${getDayLabel(date)}`;
+  }
+
+  return getDayLabel(date);
+}
+
+function getIsMobileViewport() {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    return false;
+  }
+
+  return window.matchMedia("(max-width: 960px)").matches;
+}
+
+export default function SchedulePreview({
+  items,
+  onLoadItemsForDate,
+  className = "",
+}) {
+  const today = useMemo(() => startOfLocalDay(new Date()), []);
+  const normalizedItems = useMemo(() => normalizeScheduleItems(items), [items]);
+  const [anchorDay, setAnchorDay] = useState(today);
+  const [isMobileViewport, setIsMobileViewport] = useState(getIsMobileViewport);
+  const [dayCollections, setDayCollections] = useState(() => ({
+    [toDateKey(today)]: normalizedItems.filter((item) => isSameCalendarDay(item.start_time, today)),
+    [toDateKey(addDays(today, 1))]: normalizedItems.filter((item) =>
+      isSameCalendarDay(item.start_time, addDays(today, 1)),
+    ),
+  }));
 
   useEffect(() => {
-    async function loadScheduleItems() {
-      try {
-        const items = await fetchScheduleItems();
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+      return undefined;
+    }
 
-        setScheduleItems(items);
-        onScheduleItemsLoaded?.(items);
-        setStatus("success");
-      } catch (error) {
-        setErrorMessage(error.message);
-        setStatus("error");
+    const mediaQuery = window.matchMedia("(max-width: 960px)");
+    const handleChange = (event) => setIsMobileViewport(event.matches);
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }
+
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadItemsForDay(targetDate) {
+      const dateKey = toDateKey(targetDate);
+      const localItems = normalizedItems.filter((item) =>
+        isSameCalendarDay(item.start_time, targetDate),
+      );
+
+      if (!onLoadItemsForDate) {
+        if (!cancelled) {
+          setDayCollections((current) => ({
+            ...current,
+            [dateKey]: localItems,
+          }));
+        }
+        return;
+      }
+
+      try {
+        const nextItems = normalizeScheduleItems(await onLoadItemsForDate({ date: dateKey }));
+
+        if (!cancelled) {
+          setDayCollections((current) => ({
+            ...current,
+            [dateKey]: nextItems.length || !localItems.length ? nextItems : localItems,
+          }));
+        }
+      } catch {
+        if (!cancelled) {
+          setDayCollections((current) => ({
+            ...current,
+            [dateKey]: localItems,
+          }));
+        }
       }
     }
 
-    loadScheduleItems();
-  }, [onScheduleItemsLoaded]);
+    loadItemsForDay(anchorDay);
+    loadItemsForDay(addDays(anchorDay, 1));
 
-  if (status === "loading") {
-    return <p>Loading schedule...</p>;
-  }
+    return () => {
+      cancelled = true;
+    };
+  }, [anchorDay, normalizedItems, onLoadItemsForDate, today]);
 
-  if (status === "error") {
-    return <p>{errorMessage}</p>;
-  }
-
-  if (!scheduleItems.length) {
-    return <p>No upcoming schedule items yet.</p>;
-  }
+  const tomorrow = addDays(anchorDay, 1);
+  const anchorKey = toDateKey(anchorDay);
+  const tomorrowKey = toDateKey(tomorrow);
+  const anchorItems = (dayCollections[anchorKey] || []).filter((item) =>
+    isSameCalendarDay(item.start_time, anchorDay),
+  );
+  const tomorrowItems = (dayCollections[tomorrowKey] || []).filter((item) =>
+    isSameCalendarDay(item.start_time, tomorrow),
+  );
+  const heading = getPanelHeading(anchorDay, today, { mobileSingleDay: isMobileViewport });
+  const dayStep = isMobileViewport ? 1 : 2;
 
   return (
-    <ul>
-      {scheduleItems.map((item) => (
-        <li key={item.id}>
-          <h3>{item.title}</h3>
-          <p>{item.description}</p>
-          <p>
-            <strong>When:</strong> {item.date_and_duration_string}
-          </p>
-          {item.location ? (
-            <p>
-              <strong>Where:</strong> {item.location}
-            </p>
-          ) : null}
-        </li>
-      ))}
-    </ul>
+    <section className={`panel schedule-panel ${className}`.trim()}>
+      <div className="panel-header">
+        <div>
+          <h2>{heading}</h2>
+        </div>
+        <div className="schedule-nav">
+          <button
+            type="button"
+            className="icon-button"
+            aria-label="Previous days"
+            onClick={() => setAnchorDay((current) => addDays(current, -dayStep))}
+          >
+            <i className="fa-solid fa-circle-arrow-left" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="icon-button"
+            aria-label="Next days"
+            onClick={() => setAnchorDay((current) => addDays(current, dayStep))}
+          >
+            <i className="fa-solid fa-circle-arrow-right" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+      <div className="schedule-columns">
+        <section className="schedule-day">
+          <div className="schedule-day-header">
+            <h3>{getColumnHeading(anchorDay, today, { mobileSingleDay: isMobileViewport })}</h3>
+          </div>
+          {anchorItems.length ? (
+            <ul className="schedule-list">
+              {anchorItems.map((item) => (
+                <li key={item.id} className="mini-card schedule-card">
+                  <p className="item-meta">
+                    {item.date_and_duration_string ||
+                      formatScheduleDateRange(item.start_time, item.end_time)}
+                  </p>
+                  <h3>{item.title}</h3>
+                  {item.location ? (
+                    <p className="item-meta">{getLocationLabel(item.location)}</p>
+                  ) : null}
+                  {item.meeting_url ? (
+                    <a href={item.meeting_url} target="_blank" rel="noreferrer">
+                      View in Google Calendar
+                    </a>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="empty-state">No events on this day&apos;s calendar.</p>
+          )}
+        </section>
+
+        {!isMobileViewport ? (
+          <section className="schedule-day">
+            <div className="schedule-day-header">
+              <h3>{getColumnHeading(tomorrow, today)}</h3>
+            </div>
+            {tomorrowItems.length ? (
+              <ul className="schedule-list">
+                {tomorrowItems.map((item) => (
+                  <li key={item.id} className="mini-card schedule-card">
+                    <p className="item-meta">
+                      {item.date_and_duration_string ||
+                        formatScheduleDateRange(item.start_time, item.end_time)}
+                    </p>
+                    <h3>{item.title}</h3>
+                    {item.location ? (
+                      <p className="item-meta">{getLocationLabel(item.location)}</p>
+                    ) : null}
+                    {item.meeting_url ? (
+                      <a href={item.meeting_url} target="_blank" rel="noreferrer">
+                        View in Google Calendar
+                      </a>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="empty-state">No events on this day&apos;s calendar.</p>
+            )}
+          </section>
+        ) : null}
+      </div>
+    </section>
   );
 }

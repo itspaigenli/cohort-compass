@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App.jsx";
 
 vi.mock("./pages/DashboardPage.jsx", () => ({
@@ -14,8 +14,45 @@ vi.mock("./pages/FAQPage.jsx", () => ({
   default: () => <p>FAQ page test content</p>,
 }));
 
+vi.mock("./services/linksApi.js", () => ({
+  fetchLinks: vi.fn().mockResolvedValue([]),
+}));
+
+vi.mock("./services/faqApi.js", () => ({
+  fetchFaqEntries: vi.fn().mockResolvedValue([]),
+}));
+
+vi.mock("./services/remindersApi.js", () => ({
+  fetchReminders: vi.fn().mockResolvedValue([]),
+}));
+
+vi.mock("./services/scheduleApi.js", () => ({
+  fetchScheduleItems: vi.fn().mockResolvedValue([]),
+}));
+
+vi.mock("./services/contentApi.js", () => ({
+  fetchContentDocuments: vi.fn().mockResolvedValue([]),
+}));
+
+vi.mock("./services/curriculumApi.js", () => ({
+  fetchCurriculumReferences: vi.fn().mockResolvedValue([]),
+}));
+
+vi.mock("./services/searchApi.js", () => ({
+  searchStudentHub: vi.fn().mockResolvedValue({
+    links: [],
+    faqEntries: [],
+    curriculumReferences: [],
+    contentDocuments: [],
+  }),
+}));
+
 describe("App", () => {
-  it("renders the dashboard page inside the app shell", () => {
+  beforeEach(() => {
+    window.location.hash = "";
+  });
+
+  it("renders the dashboard page inside the app shell", async () => {
     // Arrange
     render(<App />);
 
@@ -24,10 +61,12 @@ describe("App", () => {
 
     // Assert
     expect(screen.getByRole("main")).toBeInTheDocument();
-    expect(screen.getByText(/dashboard page test content/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/dashboard page test content/i),
+    ).toBeInTheDocument();
   });
 
-  it("renders the search page when the hash is search", () => {
+  it("renders the search page when the hash is search", async () => {
     // Arrange
     window.location.hash = "#search";
 
@@ -36,10 +75,12 @@ describe("App", () => {
 
     // Assert
     expect(screen.getByRole("main")).toBeInTheDocument();
-    expect(screen.getByText(/search page test content/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/search page test content/i),
+    ).toBeInTheDocument();
   });
 
-  it("renders the FAQ page when the hash is faq", () => {
+  it("renders the FAQ page when the hash is faq", async () => {
     // Arrange
     window.location.hash = "#faq";
 
@@ -48,6 +89,6 @@ describe("App", () => {
 
     // Assert
     expect(screen.getByRole("main")).toBeInTheDocument();
-    expect(screen.getByText(/faq page test content/i)).toBeInTheDocument();
+    expect(await screen.findByText(/faq page test content/i)).toBeInTheDocument();
   });
 });

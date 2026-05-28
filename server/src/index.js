@@ -1,20 +1,47 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import { checkDatabaseConnection } from "./config/db.js";
+import contentRoutes from "./routes/contentRoutes.js";
+import curriculumRoutes from "./routes/curriculumRoutes.js";
 import faqRoutes from "./routes/faqRoutes.js";
 import linksRoutes from "./routes/linksRoutes.js";
 import remindersRoutes from "./routes/remindersRoutes.js";
 import scheduleRoutes from "./routes/scheduleRoutes.js";
-import { searchLinksAndFaq } from "./models/searchModel.js";
+import searchRoutes from "./routes/search.js";
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const clientBuildPath = path.join(__dirname, "../../client/dist");
+
 const app = express();
+const allowedClientOrigins = [
+  process.env.CLIENT_ORIGIN,
+  process.env.RENDER_EXTERNAL_URL,
+  "https://cohort-compass.onrender.com",
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+].filter(Boolean);
+
+export function isAllowedClientOrigin(origin) {
+  return !origin || allowedClientOrigins.includes(origin);
+}
 
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN,
+    origin(origin, callback) {
+      if (isAllowedClientOrigin(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
   }),
 );
 
@@ -24,21 +51,11 @@ app.use("/api/faq", faqRoutes);
 app.use("/api/links", linksRoutes);
 app.use("/api/reminders", remindersRoutes);
 app.use("/api/schedule", scheduleRoutes);
+app.use("/api/curriculum", curriculumRoutes);
+app.use("/api/content", contentRoutes);
+app.use("/api/search", searchRoutes);
 
-app.get("/api/search", async (req, res) => {
-  try {
-    const searchTerm = req.query.q || "";
-    const results = await searchLinksAndFaq(searchTerm);
-
-    res.json(results);
-  } catch (error) {
-    console.error("Error searching Cohort Compass content:", error);
-
-    res.status(500).json({ error: "Unable to search Cohort Compass content." });
-  }
-});
-
-app.get("/", async (req, res) => {
+app.get("/api/health", async (req, res) => {
   const databaseConnected = await checkDatabaseConnection();
 
   res.json({
@@ -46,6 +63,12 @@ app.get("/", async (req, res) => {
     databaseConnected,
     mode: databaseConnected ? "database" : "database-unavailable",
   });
+});
+
+app.use(express.static(clientBuildPath));
+
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(clientBuildPath, "index.html"));
 });
 
 export default app;

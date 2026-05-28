@@ -1,121 +1,180 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import SearchPage from "./SearchPage.jsx";
-import { searchStudentHub } from "../services/searchApi.js";
-
-vi.mock("../services/searchApi.js", () => ({
-  searchStudentHub: vi.fn(),
-}));
 
 describe("SearchPage", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("renders the search page shell", () => {
+  it("renders the shared hero heading and search summary", () => {
     // Arrange
-    render(<SearchPage />);
-
-    // Act
-    // No user action is needed because the search page shell renders on page load.
-
-    // Assert
-    expect(
-      screen.getByRole("heading", { name: /search the student hub/i }),
-    ).toBeInTheDocument();
-  });
-
-  it("lets a student type and submit a search term", async () => {
-    // Arrange
-    searchStudentHub.mockResolvedValue({
-      links: [],
-      faqEntries: [],
-    });
-    render(<SearchPage />);
-
-    // Act
-    fireEvent.change(
-      screen.getByRole("searchbox", { name: /search the student hub/i }),
-      {
-        target: { value: "react hooks" },
-      },
+    render(
+      <SearchPage
+        query="react"
+        onSearch={() => {}}
+        results={{
+          links: [{ id: 1, title: "React Docs", url: "https://react.dev", category: "technical docs" }],
+          faqEntries: [{ id: 1, question: "React FAQ", answer: "A", category: "React + Vite" }],
+          contentDocuments: [{ slug: "react-doc", title: "React Doc", relativePath: "docs/react.md" }],
+          curriculumReferences: [{ slug: "react-curriculum", title: "react-js", relativePath: "react-js" }],
+        }}
+      />,
     );
-    fireEvent.click(screen.getByRole("button", { name: /search/i }));
-
-    // Assert
-    expect(
-      await screen.findByText(/you searched for react hooks/i),
-    ).toBeInTheDocument();
-    expect(searchStudentHub).toHaveBeenCalledWith("react hooks");
-  });
-
-  it("shows matching search results in clear groups", async () => {
-    // Arrange
-    searchStudentHub.mockResolvedValue({
-      links: [
-        {
-          id: 1,
-          title: "React Documentation",
-          description: "Official React documentation for components and hooks.",
-        },
-      ],
-      faqEntries: [
-        {
-          id: 2,
-          question: "Why is my useEffect running twice?",
-          answer: "React Strict Mode may run effects more than once.",
-        },
-      ],
-    });
-    render(<SearchPage />);
 
     // Act
-    fireEvent.change(
-      screen.getByRole("searchbox", { name: /search the student hub/i }),
-      {
-        target: { value: "react" },
-      },
-    );
-    fireEvent.click(screen.getByRole("button", { name: /search/i }));
-
-    const linksGroup = await screen.findByRole("region", {
-      name: /links/i,
-    });
-    const faqGroup = screen.getByRole("region", {
-      name: /faq/i,
-    });
+    // No user action is needed because results are provided as props.
 
     // Assert
+    expect(screen.getByRole("heading", { name: "Search the Student Hub" })).toBeInTheDocument();
+    expect(screen.getByText('Results for "react"')).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to homepage" })).toHaveAttribute("href", "#dashboard");
+    expect(screen.queryByText("Back to homepage")).not.toBeInTheDocument();
     expect(
-      within(linksGroup).getByRole("heading", {
-        name: /react documentation/i,
-      }),
+      screen.getByPlaceholderText("Search docs, tools, debugging help, or a topic"),
     ).toBeInTheDocument();
-    expect(
-      within(faqGroup).getByText(/why is my useeffect running twice/i),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Search" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Back to top" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "1 links" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "1 faq" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "1 curriculum" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "1 docs" })).toBeInTheDocument();
   });
 
-  it("shows a friendly empty state when there are no search matches", async () => {
+  it("shows empty result cards before any search runs", () => {
     // Arrange
-    searchStudentHub.mockResolvedValue({
-      links: [],
-      faqEntries: [],
-    });
-    render(<SearchPage />);
+    render(
+      <SearchPage
+        query=""
+        onSearch={() => {}}
+        results={{
+          links: [{ id: 1, title: "Should stay hidden" }],
+          faqEntries: [{ id: 2, question: "Should stay hidden" }],
+          contentDocuments: [{ slug: "doc-1", title: "Should stay hidden" }],
+          curriculumReferences: [{ slug: "curriculum-1", title: "Should stay hidden" }],
+        }}
+      />,
+    );
 
     // Act
-    fireEvent.change(
-      screen.getByRole("searchbox", { name: /search the student hub/i }),
-      {
-        target: { value: "database" },
-      },
-    );
-    fireEvent.click(screen.getByRole("button", { name: /search/i }));
+    // No user action is needed because the query starts empty.
 
     // Assert
-    expect(
-      await screen.findByText(/no results found for database/i),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Suggested Videos" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Links" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Techtonica Curriculum Repo" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Compass Content Docs" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Debugging FAQ" })).toBeInTheDocument();
+    expect(screen.getByText("No curated video suggestions yet.")).toBeInTheDocument();
+    expect(screen.getByText("No links yet.")).toBeInTheDocument();
+    expect(screen.getByText("No FAQ matches yet.")).toBeInTheDocument();
+    expect(screen.queryByText("Should stay hidden")).not.toBeInTheDocument();
+  });
+
+  it("shows curated video suggestions for known topics", () => {
+    // Arrange
+    render(
+      <SearchPage
+        query="html"
+        onSearch={() => {}}
+        results={{
+          links: [],
+          faqEntries: [],
+          contentDocuments: [],
+          curriculumReferences: [],
+        }}
+      />,
+    );
+
+    // Act
+    // No user action is needed because the query is provided as a prop.
+
+    // Assert
+    expect(screen.getByRole("heading", { name: "Suggested Videos" })).toBeInTheDocument();
+    expect(screen.getByText("HTML Full Course for Beginners")).toBeInTheDocument();
+    expect(screen.getByLabelText("Search summary")).toBeInTheDocument();
+  });
+
+  it("shows FAQ matches in a dedicated search section", () => {
+    // Arrange
+    render(
+      <SearchPage
+        query="git"
+        onSearch={() => {}}
+        results={{
+          links: [],
+          faqEntries: [
+            {
+              id: 1,
+              question: "How do I fix a merge conflict?",
+              answer: "Review the conflict markers and resolve the file.",
+              category: "Git & GitHub",
+              error_topic: "merge conflict",
+            },
+          ],
+          contentDocuments: [],
+          curriculumReferences: [],
+        }}
+      />,
+    );
+
+    // Act
+    // No user action is needed because FAQ results are provided as props.
+
+    // Assert
+    expect(screen.getByRole("heading", { name: "Debugging FAQ" })).toBeInTheDocument();
+    expect(screen.getByText("How do I fix a merge conflict?")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Browse full FAQ" })).toHaveAttribute("href", "#faq");
+    expect(screen.getByRole("heading", { name: "Links" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Techtonica Curriculum Repo" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Compass Content Docs" })).toBeInTheDocument();
+  });
+
+  it("opens the matching section on mobile when a summary pill is clicked", async () => {
+    // Arrange
+    const originalInnerWidth = window.innerWidth;
+    const originalScrollIntoView = window.HTMLElement.prototype.scrollIntoView;
+    const scrollIntoView = vi.fn();
+
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      writable: true,
+      value: 430,
+    });
+
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoView;
+
+    render(
+      <SearchPage
+        query="git"
+        onSearch={() => {}}
+        results={{
+          links: [],
+          faqEntries: [
+            {
+              id: 1,
+              question: "How do I fix a merge conflict?",
+              answer: "Review the conflict markers and resolve the file.",
+              category: "Git & GitHub",
+              error_topic: "merge conflict",
+            },
+          ],
+          contentDocuments: [],
+          curriculumReferences: [],
+        }}
+      />,
+    );
+
+    // Assert
+    expect(screen.queryByText("How do I fix a merge conflict?")).not.toBeInTheDocument();
+
+    // Act
+    fireEvent.click(screen.getByRole("button", { name: "1 faq" }));
+
+    // Assert
+    expect(screen.getByText("How do I fix a merge conflict?")).toBeInTheDocument();
+
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      writable: true,
+      value: originalInnerWidth,
+    });
+    window.HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
   });
 });

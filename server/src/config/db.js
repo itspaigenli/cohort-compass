@@ -6,10 +6,12 @@ dotenv.config();
 const { Pool } = pg;
 
 const connectionString = process.env.DATABASE_URL;
+const useDatabaseSsl = process.env.DATABASE_SSL === "true";
 
 const pool = connectionString
   ? new Pool({
       connectionString,
+      ssl: useDatabaseSsl ? { rejectUnauthorized: false } : false,
     })
   : null;
 
