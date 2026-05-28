@@ -2731,7 +2731,7 @@ button {
     text-align: center;
   }
 
-  .month-calendar-day.compact {
+  .month-calendar-day {
     align-content: space-between;
     cursor: pointer;
   }
