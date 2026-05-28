@@ -135,16 +135,8 @@ GOOGLE_CALENDAR_MAX_RESULTS=100
 Google Calendar values are optional for local development. If they are not set,
 the schedule uses the PostgreSQL `schedule_items` data.
 
-The compass-content values are also optional and can be added to `server/.env`
-when you have the local content repository:
-
-```text
-COMPASS_CONTENT_PATH=/Users/yourusername/Desktop/GitHub/compass-content
-COMPASS_CONTENT_REPO_BASE=https://github.com/itspaigenli/compass-content/blob/main
-```
-
-If the local content repository is not available, the content endpoint returns
-an empty list instead of breaking the app. No fake content documents are used.
+If the optional compass-content repository is not available, the content endpoint
+returns an empty list instead of breaking the app. No fake content documents are used.
 
 Data comes from the database, Google Calendar when configured, Techtonica
 curriculum references, compass-content files, and the small curated video list
@@ -153,8 +145,8 @@ in `client/src/data/videoResources.js`. No fake app data is used.
 Create and seed the local PostgreSQL database using the SQL files in `server/src/db/`:
 
 ```bash
-psql -d cohort-compass-db -f server/src/db/schema.sql
-psql -d cohort-compass-db -f server/src/db/seed.sql
+cd server
+npm run db:init
 ```
 
 Run the backend:
@@ -187,15 +179,13 @@ Deployed app:
 Build the frontend:
 
 ```bash
-cd client
-npm run build
+npm run build --prefix server
 ```
 
 Start the production server:
 
 ```bash
-cd ../server
-npm start
+npm start --prefix server
 ```
 
 The production server serves:
@@ -211,7 +201,7 @@ Render production setup:
 - Build command:
 
 ```text
-npm install --prefix server && npm install --prefix client && npm run build --prefix client
+npm install --prefix server && npm run build --prefix server
 ```
 
 - Start command:
@@ -265,8 +255,3 @@ Run backend tests:
 cd server
 npm test
 ```
-
-Current verified test status:
-
-- Client: 17 test files, 44 tests passing
-- Server: 13 test files, 38 tests passing
