@@ -136,11 +136,11 @@ Google Calendar values are optional for local development. If they are not set,
 the schedule uses the PostgreSQL `schedule_items` data.
 
 If the optional compass-content repository is not available, the content endpoint
-returns an empty list instead of breaking the app. No fake content documents are used.
+returns an empty list instead of breaking the app.
 
 Data comes from the database, Google Calendar when configured, Techtonica
 curriculum references, compass-content files, and the small curated video list
-in `client/src/data/videoResources.js`. No fake app data is used.
+in `client/src/data/videoResources.js`.
 
 Create and seed the local PostgreSQL database using the SQL files in `server/src/db/`:
 
