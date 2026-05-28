@@ -119,4 +119,18 @@ describe("listSchedule", () => {
     expect(listScheduleItems).toHaveBeenCalledWith({ date: "2026-05-21" });
     expect(response.body).toEqual({ scheduleItems: databaseItems });
   });
+
+  it("returns an error when the date filter is not YYYY-MM-DD", async () => {
+    // Arrange
+    const response = createResponseMock();
+
+    // Act
+    await listSchedule({ query: { date: "May 21" } }, response);
+
+    // Assert
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toEqual({ error: "Date must use YYYY-MM-DD format." });
+    expect(getGoogleCalendarScheduleItems).not.toHaveBeenCalled();
+    expect(listScheduleItems).not.toHaveBeenCalled();
+  });
 });
