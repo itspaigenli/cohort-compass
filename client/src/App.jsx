@@ -51,7 +51,8 @@ function getInitialPage() {
 async function loadOptionalAppData(loader) {
   try {
     return await loader();
-  } catch {
+  } catch (error) {
+    console.error("Unable to load optional app data:", error);
     return [];
   }
 }
@@ -115,29 +116,34 @@ function App() {
 
   useEffect(() => {
     async function loadAppData() {
-      const [
-        nextLinks,
-        nextFaqEntries,
-        nextReminders,
-        nextScheduleItems,
-        nextContentDocuments,
-        nextCurriculumReferences,
-      ] = await Promise.all([
-        loadOptionalAppData(fetchLinks),
-        loadOptionalAppData(fetchFaqEntries),
-        loadOptionalAppData(fetchReminders),
-        loadOptionalAppData(fetchScheduleItems),
-        loadOptionalAppData(fetchContentDocuments),
-        loadOptionalAppData(fetchCurriculumReferences),
-      ]);
+      try {
+        const [
+          nextLinks,
+          nextFaqEntries,
+          nextReminders,
+          nextScheduleItems,
+          nextContentDocuments,
+          nextCurriculumReferences,
+        ] = await Promise.all([
+          loadOptionalAppData(fetchLinks),
+          loadOptionalAppData(fetchFaqEntries),
+          loadOptionalAppData(fetchReminders),
+          loadOptionalAppData(fetchScheduleItems),
+          loadOptionalAppData(fetchContentDocuments),
+          loadOptionalAppData(fetchCurriculumReferences),
+        ]);
 
-      setLinks(nextLinks);
-      setFaqEntries(nextFaqEntries);
-      setReminders(nextReminders);
-      setScheduleItems(nextScheduleItems);
-      setContentDocuments(nextContentDocuments);
-      setCurriculumReferences(nextCurriculumReferences);
-      setLoading(false);
+        setLinks(nextLinks);
+        setFaqEntries(nextFaqEntries);
+        setReminders(nextReminders);
+        setScheduleItems(nextScheduleItems);
+        setContentDocuments(nextContentDocuments);
+        setCurriculumReferences(nextCurriculumReferences);
+      } catch (error) {
+        console.error("Unable to load app data:", error);
+      } finally {
+        setLoading(false);
+      }
     }
 
     loadAppData();
