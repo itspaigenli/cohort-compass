@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   formatMobileDetailDate,
   formatMonthYear,
@@ -47,14 +47,6 @@ function getReminderPreview(reminders = []) {
   return reminders.length === 1 ? firstText : `${firstText} +${reminders.length - 1} more`;
 }
 
-function getIsCompactViewport() {
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
-    return false;
-  }
-
-  return window.matchMedia("(max-width: 640px)").matches;
-}
-
 export default function MonthlyCalendar({
   items,
   reminders = [],
@@ -67,7 +59,6 @@ export default function MonthlyCalendar({
   const [visibleMonth, setVisibleMonth] = useState(
     () => new Date(today.getFullYear(), today.getMonth(), 1),
   );
-  const [isCompactViewport, setIsCompactViewport] = useState(getIsCompactViewport);
   const [selectedDateKey, setSelectedDateKey] = useState(() => toDateKey(today));
 
   const calendarDays = useMemo(() => buildCalendarDays(visibleMonth), [visibleMonth]);
@@ -104,23 +95,6 @@ export default function MonthlyCalendar({
     [reminders],
   );
   const visibleMonthLabel = formatMonthYear(visibleMonth);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
-      return undefined;
-    }
-
-    const mediaQuery = window.matchMedia("(max-width: 640px)");
-    const handleChange = (event) => setIsCompactViewport(event.matches);
-
-    if (typeof mediaQuery.addEventListener === "function") {
-      mediaQuery.addEventListener("change", handleChange);
-      return () => mediaQuery.removeEventListener("change", handleChange);
-    }
-
-    mediaQuery.addListener(handleChange);
-    return () => mediaQuery.removeListener(handleChange);
-  }, []);
 
   const currentMonthDayKeys = useMemo(() => {
     const currentMonthDays = calendarDays.filter((day) => day.getMonth() === visibleMonth.getMonth());
@@ -221,64 +195,54 @@ export default function MonthlyCalendar({
               <button
                 type="button"
                 key={dateKey}
-                className={`month-calendar-day${isCurrentMonth ? "" : " outside-month"}${isToday ? " today" : ""}${isCompactViewport ? " compact" : ""}${isSelected ? " selected" : ""}`}
-                aria-pressed={isCompactViewport ? isSelected : undefined}
-                onClick={() => {
-                  if (isCompactViewport) {
-                    setSelectedDateKey(dateKey);
-                    return;
-                  }
-                }}
+                className={`month-calendar-day${isCurrentMonth ? "" : " outside-month"}${isToday ? " today" : ""}${isSelected ? " selected" : ""}`}
+                aria-pressed={isSelected}
+                onClick={() => setSelectedDateKey(dateKey)}
               >
                 <span className="month-calendar-date">{day.getDate()}</span>
-                {isCompactViewport ? (
-                  <div className="month-calendar-dots" aria-label={`Calendar indicators for ${dateKey}`}>
+                {dayItems.length || dayReminders.length ? (
+                  <div className="month-calendar-dots" aria-hidden="true">
                     {dayItems.length ? (
                       <span
                         className="month-calendar-dot month-calendar-dot-event"
                         title={`${dayItems.length} event${dayItems.length === 1 ? "" : "s"}`}
-                        aria-label={`${dayItems.length} event${dayItems.length === 1 ? "" : "s"} on ${dateKey}`}
                       />
                     ) : null}
                     {dayReminders.length ? (
                       <span
                         className={`month-calendar-dot month-calendar-dot-reminder${allDayRemindersDone ? " done" : ""}`}
                         title={dayReminders.map((reminder) => reminder.text).filter(Boolean).join("\n")}
-                        aria-label={`${dayReminders.length} reminder${dayReminders.length === 1 ? "" : "s"} on ${dateKey}`}
                       />
                     ) : null}
                   </div>
-                ) : (
-                  <>
-                    {dayItems.length ? (
-                      <a
-                        className="month-calendar-count"
-                        href={getGoogleCalendarDayUrl(dateKey)}
-                        target="_blank"
-                        rel="noreferrer"
-                        onMouseEnter={() => handleEventCountHover(dateKey)}
-                        onFocus={() => handleEventCountHover(dateKey)}
-                      >
-                        {dayItems.length} event{dayItems.length === 1 ? "" : "s"}
-                      </a>
-                    ) : null}
-                    {dayReminders.length ? (
-                      <span
-                        className={`month-calendar-reminders${allDayRemindersDone ? " done" : ""}`}
-                        title={dayReminders.map((reminder) => reminder.text).filter(Boolean).join("\n")}
-                      >
-                        {getReminderPreview(dayReminders)}
-                      </span>
-                    ) : null}
-                  </>
-                )}
+                ) : null}
+                {dayItems.length ? (
+                  <a
+                    className="month-calendar-count"
+                    href={getGoogleCalendarDayUrl(dateKey)}
+                    target="_blank"
+                    rel="noreferrer"
+                    onMouseEnter={() => handleEventCountHover(dateKey)}
+                    onFocus={() => handleEventCountHover(dateKey)}
+                  >
+                    {dayItems.length} event{dayItems.length === 1 ? "" : "s"}
+                  </a>
+                ) : null}
+                {dayReminders.length ? (
+                  <span
+                    className={`month-calendar-reminders${allDayRemindersDone ? " done" : ""}`}
+                    title={dayReminders.map((reminder) => reminder.text).filter(Boolean).join("\n")}
+                  >
+                    {getReminderPreview(dayReminders)}
+                  </span>
+                ) : null}
               </button>
             );
           })}
         </div>
       </div>
 
-      {isCompactViewport && selectedDayData ? (
+      {selectedDayData ? (
         <div className="month-calendar-mobile-detail">
           <div className="month-calendar-mobile-detail-header">
             <h3>{formatMobileDetailDate(selectedDayData.day)}</h3>
