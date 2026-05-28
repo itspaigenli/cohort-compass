@@ -101,7 +101,8 @@ export async function getContentDocuments() {
     );
 
     return documents.sort((first, second) => first.title.localeCompare(second.title));
-  } catch {
+  } catch (error) {
+    console.error("Error loading compass-content documents:", error);
     return [];
   }
 }
