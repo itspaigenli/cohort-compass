@@ -60,4 +60,15 @@ describe("GET /api/schedule", () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ scheduleItems });
   });
+
+  it("returns an error when the date filter is not YYYY-MM-DD", async () => {
+    // Act
+    const response = await request(app).get("/api/schedule?date=05-20-2026");
+
+    // Assert
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: "Date must use YYYY-MM-DD format." });
+    expect(getGoogleCalendarScheduleItems).not.toHaveBeenCalled();
+    expect(listScheduleItems).not.toHaveBeenCalled();
+  });
 });
