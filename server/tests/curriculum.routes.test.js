@@ -31,7 +31,7 @@ describe("GET /api/curriculum", () => {
     expect(response.body).toEqual({ curriculumReferences });
   });
 
-  it("returns an empty list when curriculum references are unavailable", async () => {
+  it("returns an error when curriculum references are unavailable", async () => {
     // Arrange
     listCurriculumReferences.mockRejectedValue(new Error("GitHub unavailable"));
 
@@ -39,7 +39,7 @@ describe("GET /api/curriculum", () => {
     const response = await request(app).get("/api/curriculum");
 
     // Assert
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual({ curriculumReferences: [] });
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({ error: "Unable to fetch curriculum references." });
   });
 });
