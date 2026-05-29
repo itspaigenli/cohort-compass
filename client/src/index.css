@@ -2397,7 +2397,7 @@ button {
 .perplexity-inspired-home .compass-calendar-surface .icon-button,
 .perplexity-inspired-home .compass-snapshot-surface .icon-button {
   border-color: rgba(141, 216, 234, 0.18);
-  background: rgba(255, 255, 255, 0.04);
+  background: transparent;
   color: #8dd8ea;
 }
 
@@ -2417,7 +2417,7 @@ button {
 
 .perplexity-inspired-home .compass-calendar-surface .month-calendar-count {
   color: #8dd8ea;
-  background: rgba(0, 147, 181, 0.18);
+  background: transparent;
 }
 
 .perplexity-inspired-home .compass-calendar-surface .month-calendar-reminders {
